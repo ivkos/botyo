@@ -61,7 +61,8 @@ export default class CommandExecutorFilter extends FilterModule {
 
             return msg;
         } else {
-            module.execute(msg, this.getArgsString(msg));
+            module.execute(msg, this.getArgsString(msg))
+                .catch(err => console.error(err));
 
             return msg;
         }
