@@ -4,7 +4,9 @@ import { singleton as Singleton } from "needlepoint";
 @Singleton
 export default class TrimmingFilter extends FilterModule {
     filter(msg) {
-        msg.body = msg.body.trim();
+        if (msg.body) {
+            msg.body = msg.body.trim();
+        }
 
         return msg;
     }
