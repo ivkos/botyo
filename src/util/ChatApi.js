@@ -22,4 +22,16 @@ export default class ChatApi {
     getThreadInfo(threadId) {
         return Promise.promisify(this.api.getThreadInfo)(threadId);
     }
+
+    getThreadHistory(threadId, start, end, timestamp) {
+        return Promise.promisify(this.api.getThreadHistory)(threadId, start, end, timestamp);
+    }
+
+    sendTypingIndicator(threadId, callback) {
+        return this.api.sendTypingIndicator(threadId, callback);
+    }
+
+    markAsRead(threadId) {
+        return Promise.promisify(this.api.markAsRead)(threadId);
+    }
 }
