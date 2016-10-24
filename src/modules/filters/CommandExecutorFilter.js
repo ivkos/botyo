@@ -4,10 +4,12 @@ import { dependencies as Inject, singleton as Singleton, container as Applicatio
 import Configuration from "../../util/Configuration";
 import ChatApi from "../../util/ChatApi";
 import ColorCommandModule from "../commands/ColorCommandModule";
+import StatsCommandModule from "../commands/StatsCommandModule";
 
 const commandModulesList = [
     PingCommandModule,
-    ColorCommandModule
+    ColorCommandModule,
+    StatsCommandModule
 ];
 
 @Singleton

@@ -18,4 +18,8 @@ export default class ChatApi {
     changeThreadColor(color, threadId) {
         return Promise.promisify(this.api.changeThreadColor)(color, threadId);
     }
+
+    getThreadInfo(threadId) {
+        return Promise.promisify(this.api.getThreadInfo)(threadId);
+    }
 }
