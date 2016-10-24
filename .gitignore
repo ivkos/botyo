@@ -1,0 +1,8 @@
+build/
+
+node_modules/
+
+.idea/
+
+config.yaml
+appstate.json

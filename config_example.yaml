@@ -1,0 +1,13 @@
+# Facebook account credentials
+account:
+  email: FACEBOOK_EMAIL
+  password: FACEBOOK_PASSWORD
+
+# Threads to listen to
+threads:
+  - 192123512310277
+  - 1621236172
+
+app:
+  stateFile: appstate.json
+  commandEscape: "#" # character all commands to the bot should be preceeded with (e.g. #ping)
