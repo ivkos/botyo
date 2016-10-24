@@ -5,11 +5,13 @@ import Configuration from "../../util/Configuration";
 import ChatApi from "../../util/ChatApi";
 import ColorCommandModule from "../commands/ColorCommandModule";
 import StatsCommandModule from "../commands/StatsCommandModule";
+import WhoDisCommandModule from "../commands/WhoDisCommandModule";
 
 const commandModulesList = [
     PingCommandModule,
     ColorCommandModule,
-    StatsCommandModule
+    StatsCommandModule,
+    WhoDisCommandModule
 ];
 
 @Singleton

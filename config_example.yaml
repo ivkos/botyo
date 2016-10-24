@@ -5,9 +5,14 @@ account:
 
 # Threads to listen to
 threads:
+  - 162123511236172
   - 192123512310277
-  - 1621236172
 
 app:
-  stateFile: appstate.json
-  commandEscape: "#" # character all commands to the bot should be preceeded with (e.g. #ping)
+  stateFile: appstate.json  # where to save the state of the Facebook chat API
+  commandEscape: "#"        # character all commands to the bot should be preceeded with (e.g. #ping)
+
+modules:
+  whodis:
+    recentMessagesCount: 50   # how many recent messages to search for photos
+    googlApiKey: YOUR_GOOGL_API_KEY   # https://developers.google.com/url-shortener/v1/getting_started?csw=1#APIKey
