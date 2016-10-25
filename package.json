@@ -41,6 +41,9 @@
     "brototype": "0.0.5",
     "facebook-chat-api": "^1.2.0",
     "goo.gl": "^0.1.4",
+    "google-images": "^2.0.0",
+    "request": "^2.75.0",
+    "stream-buffers": "^3.0.1",
     "yamljs": "^0.2.8"
   }
 }
