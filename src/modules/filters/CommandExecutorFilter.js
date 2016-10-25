@@ -7,13 +7,15 @@ import ColorCommandModule from "../commands/ColorCommandModule";
 import StatsCommandModule from "../commands/StatsCommandModule";
 import WhoDisCommandModule from "../commands/WhoDisCommandModule";
 import EmojifyCommand from "../commands/EmojifyCommand";
+import AestheticCommand from "../commands/AestheticCommand";
 
 const commandModulesList = [
     PingCommandModule,
     ColorCommandModule,
     StatsCommandModule,
     WhoDisCommandModule,
-    EmojifyCommand
+    EmojifyCommand,
+    AestheticCommand
 ];
 
 @Singleton
