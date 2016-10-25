@@ -15,6 +15,10 @@ export default class AutoEmojifyFilter extends FilterModule {
     }
 
     filter(msg) {
+        if (!msg.body) {
+            return msg;
+        }
+
         if (AutoEmojifyFilter.shouldEmojify(msg.body)) {
             const response = msg.body.replace(emojifiablePattern, match => EmojifyCommand.emojify(match));
 
