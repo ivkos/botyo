@@ -1,7 +1,9 @@
 import FilterModule from "../FilterModule";
-import { dependencies as Inject, singleton as Singleton, container as ApplicationIocContainer } from "needlepoint";
+import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import ChatApi from "../../util/ChatApi";
 import EmojifyCommand from "../commands/EmojifyCommand";
+
+const emojifiablePattern = /\b((?:[A-Z]\s){2,}[A-Z])\b/;
 
 @Singleton
 @Inject(ChatApi)
@@ -13,14 +15,16 @@ export default class AutoEmojifyFilter extends FilterModule {
     }
 
     filter(msg) {
-        if (AutoEmojifyFilter.isEmojifiable(msg.body)) {
-            this.api.sendMessage(EmojifyCommand.emojify(msg.body), msg.threadID);
+        if (AutoEmojifyFilter.shouldEmojify(msg.body)) {
+            const response = msg.body.replace(emojifiablePattern, match => EmojifyCommand.emojify(match));
+
+            this.api.sendMessage(response, msg.threadID);
         }
 
         return msg;
     }
 
-    static isEmojifiable(text) {
-        return text.match(/((?:[A-Z]\s){2,}[A-Z])/) !== null;
+    static shouldEmojify(text) {
+        return text.match(emojifiablePattern) !== null;
     }
 }
