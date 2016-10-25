@@ -6,12 +6,14 @@ import ChatApi from "../../util/ChatApi";
 import ColorCommandModule from "../commands/ColorCommandModule";
 import StatsCommandModule from "../commands/StatsCommandModule";
 import WhoDisCommandModule from "../commands/WhoDisCommandModule";
+import EmojifyCommand from "../commands/EmojifyCommand";
 
 const commandModulesList = [
     PingCommandModule,
     ColorCommandModule,
     StatsCommandModule,
-    WhoDisCommandModule
+    WhoDisCommandModule,
+    EmojifyCommand
 ];
 
 @Singleton
