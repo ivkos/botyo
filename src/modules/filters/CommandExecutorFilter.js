@@ -50,6 +50,11 @@ export default class CommandExecutorFilter extends FilterModule {
 
         const commandName = this.getCommandNameOfMessage(msg);
 
+        if (commandName == "help") {
+            this.api.sendMessage(this.getCommandList(), msg.threadID);
+            return msg;
+        }
+
         /**
          * @type {CommandModule}
          */
@@ -100,5 +105,15 @@ export default class CommandExecutorFilter extends FilterModule {
         msg += escapedCommandName + " " + commandModuleInstance.getUsage();
 
         return msg;
+    }
+
+    getCommandList() {
+        let str = "\u{1F527} Command list:\n\n";
+
+        this.commandMap.forEach((module, commandName) => {
+            str += this.escape + commandName + " - " + module.getDescription() + "\n";
+        });
+
+        return str;
     }
 }
