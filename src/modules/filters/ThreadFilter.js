@@ -1,6 +1,7 @@
 import FilterModule from "../FilterModule";
 import Configuration from "../../util/Configuration";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
+import Promise from "bluebird";
 
 @Singleton
 @Inject(Configuration)

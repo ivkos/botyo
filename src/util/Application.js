@@ -1,4 +1,5 @@
 import { dependencies as Inject } from "needlepoint";
+import Promise from "bluebird";
 import ChatApi from "./ChatApi";
 import Configuration from "./Configuration";
 import ThreadFilter from "../modules/filters/ThreadFilter";

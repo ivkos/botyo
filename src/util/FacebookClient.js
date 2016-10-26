@@ -1,6 +1,7 @@
 import { dependencies as Inject } from "needlepoint";
 import Configuration from "./Configuration";
 import * as fs from "fs";
+import Promise from "bluebird";
 
 const login = require("facebook-chat-api");
 

@@ -3,6 +3,7 @@ import ChatApi from "../../util/ChatApi";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import GooglUrlShortener from "../../util/GooglUrlShortener";
 import Configuration from "../../util/Configuration";
+import Promise from "bluebird";
 
 @Singleton
 @Inject(Configuration, ChatApi, GooglUrlShortener)
