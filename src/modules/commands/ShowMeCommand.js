@@ -76,7 +76,7 @@ export default class ShowMeCommand extends CommandModule {
                 return Promise
                     .all(completionPromises)
                     .catch(err => {
-                        this.api.sendMessage("Sorry, something went wrong. \u{1F615}");
+                        this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
                         throw err;
                     })
                     .then(() => paths.map(path => fs.createReadStream(path)));
@@ -85,7 +85,7 @@ export default class ShowMeCommand extends CommandModule {
                 attachment: streams
             }))
             .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
-            .catch(err => this.api.sendMessage("Sorry, something went wrong. \u{1F615}"))
+            .catch(err => this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID))
             .finally(() => {
                 if (typeof endFn == "function") {
                     endFn();
