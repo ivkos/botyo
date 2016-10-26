@@ -19,7 +19,9 @@ export default class ShowMeCommand extends CommandModule {
         this.config = config;
         this.api = api;
 
-        this.imagesCount = this.config.get("modules.showme.imagesCount");
+        this.defaultImageCount = this.config.get("modules.showme.defaultImageCount");
+        this.maxImageCount = this.config.get("modules.showme.maxImageCount");
+
         this.imagesClient = new ImagesClient(
             this.config.get("modules.showme.cseId"),
             this.config.get("modules.showme.cseApiKey")
@@ -35,21 +37,29 @@ export default class ShowMeCommand extends CommandModule {
     }
 
     getUsage() {
-        return "<query>";
+        return "[numberOfImages] <query>";
     }
 
     validate(msg, argsString) {
-        return argsString.length > 0;
+        if (!argsString) return false;
+
+        const opts = this.parseArgsString(argsString);
+        if (!opts) return false;
+        if (!opts.query) return false;
+
+        return true;
     }
 
     execute(msg, query) {
         let endFn;
         let tempFilesList;
 
+        const opts = this.parseArgsString(query);
+
         return new Promise(resolve => {
             endFn = this.api.sendTypingIndicator(msg.threadID, () => resolve())
         })
-            .then(() => this.getImageUrls(query))
+            .then(() => this.getImageUrls(opts.query, opts.imageCount))
             .then(urls => this.createTempFilesForUrls(urls).then(paths => {
                 tempFilesList = paths;
 
@@ -75,6 +85,7 @@ export default class ShowMeCommand extends CommandModule {
                 attachment: streams
             }))
             .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
+            .catch(err => this.api.sendMessage("Sorry, something went wrong. \u{1F615}"))
             .finally(() => {
                 if (typeof endFn == "function") {
                     endFn();
@@ -84,10 +95,10 @@ export default class ShowMeCommand extends CommandModule {
             });
     }
 
-    getImageUrls(query) {
+    getImageUrls(query, imageCount) {
         return this.imagesClient.search(query)
             .then(images => images
-                .slice(0, this.imagesCount) // gets the first (this.imagesCount) images
+                .slice(0, imageCount)
                 .map(i => i.url)
             );
     }
@@ -107,5 +118,21 @@ export default class ShowMeCommand extends CommandModule {
         });
 
         return Promise.all(promises);
+    }
+
+    parseArgsString(argsString) {
+        const m = argsString.match(/(\d+)\s*(.*)|(.+)/);
+        if (m === null) return undefined;
+
+        const query = (m[2] || m[3] || m[1]).trim();
+        const parsedImageCount = parseInt(m[2] ? m[1] : this.defaultImageCount);
+        const normalizedImageCount = parsedImageCount <= 0 || parsedImageCount > this.maxImageCount
+            ? this.defaultImageCount
+            : parsedImageCount;
+
+        return {
+            query: query,
+            imageCount: normalizedImageCount
+        };
     }
 }

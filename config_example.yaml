@@ -17,6 +17,7 @@ modules:
     recentMessagesCount: 50   # how many recent messages to search for photos
     googlApiKey: YOUR_GOOGL_API_KEY   # https://developers.google.com/url-shortener/v1/getting_started?csw=1#APIKey
   showme:
-    imagesCount: 3           # how many images to return
+    defaultImageCount: 2     # how many images to return
+    maxImageCount: 10        # max number of images to return
     cseId: CSE_ID            # info how to obtain these:
     cseApiKey: CSE_API_KEY   # https://github.com/vdemedes/google-images
