@@ -52,7 +52,7 @@ export default class ShowMeCommand extends CommandModule {
 
     execute(msg, query) {
         let endFn;
-        let tempFilesList;
+        let tempFilesList = [];
 
         const opts = this.parseArgsString(query);
 
@@ -85,7 +85,10 @@ export default class ShowMeCommand extends CommandModule {
                 attachment: streams
             }))
             .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
-            .catch(err => this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID))
+            .catch(err => {
+                this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
+                throw err;
+            })
             .finally(() => {
                 if (typeof endFn == "function") {
                     endFn();
