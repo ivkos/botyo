@@ -3,6 +3,7 @@ import Configuration from "../../util/Configuration";
 import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
 import ImagesClient from "google-images";
+import Promise from "bluebird";
 
 @Singleton
 @Inject(Configuration, ChatApi)
@@ -37,12 +38,36 @@ export default class ShowMeCommand extends CommandModule {
     }
 
     execute(msg, query) {
-        return this.getImageUrls(query)
-            .then(urls => urls[0])
+        let endFn;
+
+        return new Promise(resolve => {
+            endFn = this.api.sendTypingIndicator(msg.threadID, () => resolve())
+        })
+            .then(() => this.getImageUrls(query))
+            .then(urls => {
+                console.log("URLs", urls);
+
+                const first = urls[0];
+                console.log("Sending: " + first);
+
+                return first;
+            })
             .then(url => ({
                 url: url
             }))
-            .then(theMessage => this.api.sendMessage(theMessage, msg.threadID));
+            .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
+            .catch(err => {
+                if (err.error && err.error == "Invalid url") {
+                    return this.api.sendMessage("Sorry, Facebook doesn't like this picture. \u{1F61E}", msg.threadID);
+                }
+
+                throw err;
+            })
+            .finally(() => {
+                if (typeof endFn == "function") {
+                    endFn();
+                }
+            });
     }
 
     getImageUrls(query) {
