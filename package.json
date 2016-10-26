@@ -43,7 +43,7 @@
     "goo.gl": "^0.1.4",
     "google-images": "^2.0.0",
     "request": "^2.75.0",
-    "stream-buffers": "^3.0.1",
+    "tmp": "0.0.29",
     "yamljs": "^0.2.8"
   }
 }

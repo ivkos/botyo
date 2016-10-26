@@ -4,6 +4,11 @@ import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
 import ImagesClient from "google-images";
 import Promise from "bluebird";
+import request from "request";
+import tmp from "tmp";
+import * as fs from "fs";
+import * as url from "url";
+import * as path from "path";
 
 @Singleton
 @Inject(Configuration, ChatApi)
@@ -39,34 +44,43 @@ export default class ShowMeCommand extends CommandModule {
 
     execute(msg, query) {
         let endFn;
+        let tempFilesList;
 
         return new Promise(resolve => {
             endFn = this.api.sendTypingIndicator(msg.threadID, () => resolve())
         })
             .then(() => this.getImageUrls(query))
-            .then(urls => {
-                console.log("URLs", urls);
+            .then(urls => this.createTempFilesForUrls(urls).then(paths => {
+                tempFilesList = paths;
 
-                const first = urls[0];
-                console.log("Sending: " + first);
+                const writeStreams = paths.map(path => fs.createWriteStream(path));
 
-                return first;
-            })
-            .then(url => ({
-                url: url
+                const completionPromises = urls.map((url, i) =>
+                    new Promise((resolve, reject) =>
+                        request.get(url)
+                            .on('error', err => reject(err))
+                            .pipe(writeStreams[i])
+                            .on('close', () => resolve())
+                    ));
+
+                return Promise
+                    .all(completionPromises)
+                    .catch(err => {
+                        this.api.sendMessage("Sorry, something went wrong. \u{1F615}");
+                        throw err;
+                    })
+                    .then(() => paths.map(path => fs.createReadStream(path)));
+            }))
+            .then(streams => ({
+                attachment: streams
             }))
             .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
-            .catch(err => {
-                if (err.error && err.error == "Invalid url") {
-                    return this.api.sendMessage("Sorry, Facebook doesn't like this picture. \u{1F61E}", msg.threadID);
-                }
-
-                throw err;
-            })
             .finally(() => {
                 if (typeof endFn == "function") {
                     endFn();
                 }
+
+                tempFilesList.forEach(path => fs.unlink(path));
             });
     }
 
@@ -76,5 +90,22 @@ export default class ShowMeCommand extends CommandModule {
                 .slice(0, this.imagesCount) // gets the first (this.imagesCount) images
                 .map(i => i.url)
             );
+    }
+
+    createTempFilesForUrls(urls) {
+        const promises = urls.map(theUrl => {
+            const imageExtension = path.extname(url.parse(theUrl).pathname);
+
+            return new Promise((resolve, reject) =>
+                tmp.tmpName({
+                    postfix: imageExtension
+                }, (err, path) => {
+                    if (err) return reject(err);
+
+                    return resolve(path);
+                }))
+        });
+
+        return Promise.all(promises);
     }
 }
