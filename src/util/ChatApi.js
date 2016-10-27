@@ -34,4 +34,8 @@ export default class ChatApi {
     markAsRead(threadId) {
         return Promise.promisify(this.api.markAsRead)(threadId);
     }
+
+    getUserInfo(ids) {
+        return Promise.promisify(this.api.getUserInfo)(ids);
+    }
 }
