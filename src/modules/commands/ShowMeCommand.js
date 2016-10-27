@@ -124,7 +124,7 @@ export default class ShowMeCommand extends CommandModule {
     }
 
     parseArgsString(argsString) {
-        const m = argsString.match(/(\d+)\s*(.*)|(.+)/);
+        const m = argsString.match(/(\d+)\b(.*)|(.+)/);
         if (m === null) return undefined;
 
         const query = (m[2] || m[3] || m[1]).trim();
