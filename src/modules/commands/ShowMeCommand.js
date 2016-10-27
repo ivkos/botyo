@@ -9,6 +9,7 @@ import tmp from "tmp";
 import * as fs from "fs";
 import * as url from "url";
 import * as path from "path";
+import mime from "mime-types";
 
 @Singleton
 @Inject(Configuration, ChatApi)
@@ -108,11 +109,18 @@ export default class ShowMeCommand extends CommandModule {
 
     createTempFilesForUrls(urls) {
         const promises = urls.map(theUrl => {
-            const imageExtension = path.extname(url.parse(theUrl).pathname);
+            const pathname = url.parse(theUrl).pathname;
+            const mimeType = mime.lookup(pathname);
+            let extension = path.extname(pathname);
+
+            // fallback to jpg if the extension is missing or not one for an image
+            if (!mimeType || mimeType.split("/")[0] != "image") {
+                extension = ".jpg";
+            }
 
             return new Promise((resolve, reject) =>
                 tmp.tmpName({
-                    postfix: imageExtension
+                    postfix: extension
                 }, (err, path) => {
                     if (err) return reject(err);
 
