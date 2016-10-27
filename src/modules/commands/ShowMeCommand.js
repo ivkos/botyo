@@ -61,6 +61,10 @@ export default class ShowMeCommand extends CommandModule {
             endFn = this.api.sendTypingIndicator(msg.threadID, () => resolve())
         })
             .then(() => this.getImageUrls(opts.query, opts.imageCount))
+            .catch(err => {
+                this.api.sendMessage("Sorry, something went wrong with the Google Images query. \u{1F615}", msg.threadID);
+                throw err;
+            })
             .then(urls => this.createTempFilesForUrls(urls).then(paths => {
                 tempFilesList = paths;
 
@@ -77,7 +81,7 @@ export default class ShowMeCommand extends CommandModule {
                 return Promise
                     .all(completionPromises)
                     .catch(err => {
-                        this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
+                        this.api.sendMessage("Sorry, I couldn't download one or more of the images. \u{1F615}", msg.threadID);
                         throw err;
                     })
                     .then(() => paths.map(path => fs.createReadStream(path)));
@@ -87,7 +91,7 @@ export default class ShowMeCommand extends CommandModule {
             }))
             .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
             .catch(err => {
-                this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
+                this.api.sendMessage("Sorry, I couldn't send you one or more of the images. \u{1F615}", msg.threadID);
                 throw err;
             })
             .finally(() => {
