@@ -53,6 +53,8 @@ export default class HeIsRisenFilter extends FilterModule {
                 const prop = msg.senderID + ".firstName";
 
                 if (bro.doYouEven(prop) === Bro.NOWAY) {
+                    console.error("msg.senderID", msg.senderID);
+                    console.error("userInfo", info);
                     throw new Error("Could not get firstName");
                 }
 
