@@ -10,7 +10,7 @@ export default class Aliases {
     }
 
     getUserIdByThreadIdAndAlias(threadId, alias) {
-        const aliasMap = this.aliasesMap.get(threadId);
+        const aliasMap = this.aliasesMap.get(parseInt(threadId));
 
         if (aliasMap === undefined) {
             return undefined;
