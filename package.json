@@ -40,6 +40,7 @@
     "bluebird": "^3.4.6",
     "brototype": "0.0.5",
     "facebook-chat-api": "^1.2.0",
+    "glob": "^7.1.1",
     "goo.gl": "^0.1.4",
     "google-images": "^2.0.0",
     "mime-types": "^2.1.12",

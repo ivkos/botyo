@@ -1,24 +1,8 @@
-import FilterModule from "../FilterModule";
-import PingCommandModule from "../commands/PingCommandModule";
 import { dependencies as Inject, singleton as Singleton, container as ApplicationIocContainer } from "needlepoint";
+import FilterModule from "../FilterModule";
 import Configuration from "../../util/Configuration";
 import ChatApi from "../../util/ChatApi";
-import ColorCommandModule from "../commands/ColorCommandModule";
-import StatsCommandModule from "../commands/StatsCommandModule";
-import WhoDisCommandModule from "../commands/WhoDisCommandModule";
-import EmojifyCommand from "../commands/EmojifyCommand";
-import AestheticCommand from "../commands/AestheticCommand";
-import ShowMeCommand from "../commands/ShowMeCommand";
-
-const commandModulesList = [
-    PingCommandModule,
-    ColorCommandModule,
-    StatsCommandModule,
-    WhoDisCommandModule,
-    EmojifyCommand,
-    AestheticCommand,
-    ShowMeCommand
-];
+import glob from "glob";
 
 @Singleton
 @Inject(Configuration, ChatApi)
@@ -31,15 +15,16 @@ export default class CommandExecutorFilter extends FilterModule {
         super();
 
         this.config = config;
+        this.api = api;
         this.escape = this.config.get("app.commandEscape");
 
-        this.api = api;
-
         this.commandMap = new Map();
-        commandModulesList
+        glob.sync("../commands/*.js", { cwd: __dirname })
+            .map(fn => require(fn).default)
             .map(m => ApplicationIocContainer.resolve(m))
             .forEach(m => {
                 this.commandMap.set(m.getCommand(), m);
+                console.log("Registered " + this.escape + m.getCommand());
             });
     }
 
