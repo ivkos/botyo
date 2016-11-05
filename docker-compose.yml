@@ -1,0 +1,17 @@
+version: '2'
+services:
+  bot:
+    image: ivkos/facebook-group-chat-bot-app
+#    depends_on:
+#      - mongo
+#    links:
+#      - mongo:mongo
+    volumes:
+      - ./data/bot:/data/facebook-group-chat-bot
+
+#  mongo:
+#    image: mongo:3.2
+#    expose:
+#      - "27017"
+#    volumes:
+#      - ./data/mongo:/data/db

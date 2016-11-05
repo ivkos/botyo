@@ -4,8 +4,11 @@ set -e
 
 ./scripts/build-2-app.sh
 
+mkdir -p ./data/bot
+mkdir -p ./data/mongo
+
 printf "\033c" # clear the screen
-CONTAINER_ID=$(docker run -d ivkos/facebook-group-chat-bot-app)
+docker-compose up -d
 
 printf "\033c"
-docker logs -t -f ${CONTAINER_ID}
+docker-compose logs -f

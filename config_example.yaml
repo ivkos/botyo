@@ -17,7 +17,7 @@ threads:
         - hughes
 
 app:
-  stateFile: appstate.json  # where to save the state of the Facebook chat API
+  stateFile: /data/facebook-group-chat-bot/appstate.json  # where to save the state of the Facebook chat API
   commandEscape: "#"        # character all commands to the bot should be preceeded with (e.g. #ping)
 
 modules:
