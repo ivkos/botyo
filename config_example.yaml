@@ -6,7 +6,15 @@ account:
 # Threads to listen to
 threads:
   - 162123511236172
-  - 192123512310277
+  - 192123512310277:  # thread id
+    aliases:
+      - 4:            # facebook id of person
+        - zuck
+        - mark
+        - zuckerberg
+      - 5:
+        - chris
+        - hughes
 
 app:
   stateFile: appstate.json  # where to save the state of the Facebook chat API
