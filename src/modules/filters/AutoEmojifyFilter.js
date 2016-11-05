@@ -3,7 +3,7 @@ import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import ChatApi from "../../util/ChatApi";
 import EmojifyCommand from "../commands/EmojifyCommand";
 
-const emojifiablePattern = /\b((?:[A-Z]\s){2,}[A-Z])\b/;
+const emojifiablePattern = /\b((?:[A-Z]\s){2,}[A-Z])\b/g;
 
 @Singleton
 @Inject(ChatApi)
