@@ -9,4 +9,4 @@ ENV     HOME /home/node
 # Build and start
 WORKDIR /home/node/facebook-group-chat-bot
 
-CMD     ["npm", "start"]
+CMD     ["yarn", "run", "start"]
