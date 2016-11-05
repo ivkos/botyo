@@ -3,7 +3,7 @@ import ChatApi from "../../util/ChatApi";
 import { dependencies as Inject } from "needlepoint";
 
 @Inject(ChatApi)
-export default class ColorCommandModule extends CommandModule {
+export default class ColorCommand extends CommandModule {
     constructor(api) {
         super();
 

@@ -6,7 +6,7 @@ import Configuration from "../../util/Configuration";
 import Promise from "bluebird";
 
 @Inject(Configuration, ChatApi, GooglUrlShortener)
-export default class WhoDisCommandModule extends CommandModule {
+export default class WhoDisCommand extends CommandModule {
     constructor(config, api, googl) {
         super();
 
