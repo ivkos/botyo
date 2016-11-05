@@ -43,6 +43,7 @@
     "glob": "^7.1.1",
     "goo.gl": "^0.1.4",
     "google-images": "^2.0.0",
+    "markovchain": "^1.0.2",
     "mime-types": "^2.1.12",
     "moment": "^2.15.2",
     "request": "^2.75.0",
