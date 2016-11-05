@@ -21,7 +21,10 @@ export default class CommandExecutorFilter extends FilterModule {
         this.commandMap = new Map();
         glob.sync("../commands/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
-            .map(m => ApplicationIocContainer.resolve(m))
+            .map(m => {
+                ApplicationIocContainer.registerAsSingleton(m);
+                return ApplicationIocContainer.resolveSingleton(m);
+            })
             .forEach(m => {
                 this.commandMap.set(m.getCommand(), m);
                 console.log("Registered " + this.escape + m.getCommand());
