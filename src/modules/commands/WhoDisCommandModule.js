@@ -1,11 +1,10 @@
 import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
-import { dependencies as Inject, singleton as Singleton } from "needlepoint";
+import { dependencies as Inject } from "needlepoint";
 import GooglUrlShortener from "../../util/GooglUrlShortener";
 import Configuration from "../../util/Configuration";
 import Promise from "bluebird";
 
-@Singleton
 @Inject(Configuration, ChatApi, GooglUrlShortener)
 export default class WhoDisCommandModule extends CommandModule {
     constructor(config, api, googl) {

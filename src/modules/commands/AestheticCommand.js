@@ -1,8 +1,7 @@
 import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
-import { dependencies as Inject, singleton as Singleton } from "needlepoint";
+import { dependencies as Inject } from "needlepoint";
 
-@Singleton
 @Inject(ChatApi)
 export default class AestheticCommand extends CommandModule {
     constructor(api) {

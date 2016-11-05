@@ -1,4 +1,4 @@
-import { dependencies as Inject, singleton as Singleton } from "needlepoint";
+import { dependencies as Inject } from "needlepoint";
 import Configuration from "../../util/Configuration";
 import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
@@ -11,7 +11,6 @@ import * as url from "url";
 import * as path from "path";
 import mime from "mime-types";
 
-@Singleton
 @Inject(Configuration, ChatApi)
 export default class ShowMeCommand extends CommandModule {
     constructor(config, api) {
