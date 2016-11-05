@@ -1,6 +1,6 @@
 FROM    ivkos/facebook-group-chat-bot-backbone
 
-ADD     package.json /home/node/facebook-group-chat-bot/
+ADD     package.json /app/
 
-WORKDIR /home/node/facebook-group-chat-bot
+WORKDIR /app
 RUN     yarn install

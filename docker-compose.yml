@@ -7,7 +7,7 @@ services:
 #    links:
 #      - mongo:mongo
     volumes:
-      - ./data/bot:/data/facebook-group-chat-bot
+      - ./data/app:/data/app
 
 #  mongo:
 #    image: mongo:3.2

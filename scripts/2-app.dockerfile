@@ -1,18 +1,10 @@
 FROM    ivkos/facebook-group-chat-bot-node-deps
 
-ADD     . /home/node/facebook-group-chat-bot
+ADD     . /app
 
-RUN     chown -R node:node /home/node/facebook-group-chat-bot
+RUN     mkdir -p /data/app
+VOLUME  /data/app
 
-RUN     mkdir -p           /data/facebook-group-chat-bot \
-     && chown -R node:node /data/facebook-group-chat-bot
-
-VOLUME  /data/facebook-group-chat-bot
-
-USER    node
-ENV     HOME /home/node
-
-# Build and start
-WORKDIR /home/node/facebook-group-chat-bot
+WORKDIR /app
 
 CMD     ["yarn", "run", "start"]

@@ -4,7 +4,7 @@ set -e
 
 ./scripts/build-2-app.sh
 
-mkdir -p ./data/bot
+mkdir -p ./data/app
 mkdir -p ./data/mongo
 
 printf "\033c" # clear the screen
