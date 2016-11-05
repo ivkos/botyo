@@ -1,6 +1,7 @@
 import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
 import { dependencies as Inject } from "needlepoint";
+import Bro from "brototype";
 
 @Inject(ChatApi)
 export default class StatsCommand extends CommandModule {
@@ -28,10 +29,27 @@ export default class StatsCommand extends CommandModule {
 
     execute(msg, argsString) {
         return this.api.getThreadInfo(msg.threadID).then(info => {
-            let result = info.emoji.emoji || "\u{1F518}";
-            result += " " + info.name + "\n";
-            result += "\u{1F465} " + info.participantIDs.length + " participants\n";
-            result += "\u{1F4DD} " + info.messageCount + " messages";
+            const bro = new Bro(info);
+
+            let result = "";
+
+            if (bro.doYouEven("emoji.emoji")) {
+                result += info.emoji.emoji;
+            } else {
+                result += "\u{1F518}";
+            }
+
+            if (bro.doYouEven("name")) {
+                result += " " + info.name + "\n";
+            }
+
+            if (bro.doYouEven("participantIDs.length")) {
+                result += "\u{1F465} " + info.participantIDs.length + " participants\n";
+            }
+
+            if (bro.doYouEven("messageCount")) {
+                result += "\u{1F4DD} " + info.messageCount + " messages\n";
+            }
 
             return this.api.sendMessage(result, msg.threadID);
         });
