@@ -38,3 +38,6 @@ modules:
     watchList:               # list of ids of people to watch; ignored if watchEveryone is true
       - USER_ID_1
       - USER_ID_2
+
+  quote:
+    maxMarkovSentenceWordCount: 20

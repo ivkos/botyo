@@ -16,6 +16,7 @@ export default class QuoteCommand extends CommandModule {
         this.aliases = aliases;
 
         this.escape = this.config.get("app.commandEscape");
+        this.maxMarkovSentenceWordCount = this.config.get("modules.quote.maxMarkovSentenceWordCount");
     }
 
     getCommand() {
@@ -65,7 +66,7 @@ export default class QuoteCommand extends CommandModule {
 
                 return chain
                     .start(randomWordFn)
-                    .end()
+                    .end(this.maxMarkovSentenceWordCount)
                     .process();
             });
 
