@@ -18,6 +18,7 @@ threads:
 
 app:
   stateFile: /data/app/appstate.json  # where to save the state of the Facebook chat API
+  bannerFile: banner.txt    # file contents to print when listening has been started
   commandEscape: "#"        # character all commands to the bot should be preceeded with (e.g. #ping)
 
 modules:

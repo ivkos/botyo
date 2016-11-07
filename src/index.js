@@ -2,33 +2,38 @@ import "source-map-support/register";
 import { container as ApplicationIocContainer } from "needlepoint";
 import Configuration from "./util/Configuration";
 import FacebookClient from "./util/FacebookClient";
-import ChatApi from "./util/ChatApi";
 import Application from "./util/Application";
+import MongoConnector from "./util/persistence/MongoConnector";
+import Promise from "bluebird";
+import AsyncResolvable from "./util/AsyncResolvable";
 
-ApplicationIocContainer.registerInstance(Configuration, new Configuration("config.yaml"));
-const client = ApplicationIocContainer.resolve(FacebookClient);
+ApplicationIocContainer.registerInstance(
+    Configuration,
+    new Configuration("config.yaml")
+);
 
-client.login().then(api => {
-    ApplicationIocContainer.registerInstance(ChatApi, new ChatApi(api));
+Promise
+    .all([
+        MongoConnector,
+        FacebookClient,
+    ])
+    .then(deps => {
+        const isResolvable = deps.every(dep => {
+            if (!(dep.prototype instanceof AsyncResolvable)) {
+                console.error(`${dep.name} is not AsyncResolvable`);
+                return false;
+            }
 
-    return ApplicationIocContainer.resolve(Application).start();
-}).catch(err => console.error(err));
+            return true;
+        });
 
-//region Register termination handlers
-const goodbye = () => {
-    console.log("Facebook Group Chat Bot is shutting down...");
-
-    if (client.isAppStateAvailable()) {
-        return console.log("Bot is now offline. Will not log out to preserve app state.");
-    }
-
-    client.logout().then(() => {
-        console.log("Bot is now offline and logged out of Facebook.");
-        process.exit();
-    });
-};
-
-process.on('SIGTERM', goodbye);
-process.on('SIGINT', goodbye);
-process.on('SIGHUP', goodbye);
-//endregion
+        return isResolvable
+            ? Promise.resolve(deps)
+            : Promise.reject("One or more of the dependencies could not be resolved.");
+    })
+    .then(deps => deps.map(dep => ApplicationIocContainer.resolve(dep)))
+    .then(deps => deps.map(dep => dep.resolve()))
+    .all()
+    .then(instances => instances.forEach(i => ApplicationIocContainer.registerInstance(i.constructor, i)))
+    .then(() => ApplicationIocContainer.resolve(Application).start())
+    .catch((err) => console.error(err));

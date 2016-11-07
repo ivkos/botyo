@@ -47,6 +47,8 @@
     "markovchain": "^1.0.2",
     "mime-types": "^2.1.12",
     "moment": "^2.15.2",
+    "mongodb": "^2.2.11",
+    "npid": "^0.4.0",
     "request": "^2.75.0",
     "tmp": "0.0.29",
     "yamljs": "^0.2.8"

@@ -1,20 +1,25 @@
-import { dependencies as Inject } from "needlepoint";
+import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import Configuration from "./Configuration";
 import * as fs from "fs";
 import Promise from "bluebird";
+import AsyncResolvable from "./AsyncResolvable";
+import ChatApi from "./ChatApi";
 
 const login = require("facebook-chat-api");
 
+@Singleton
 @Inject(Configuration)
-export default class FacebookClient {
+export default class FacebookClient extends AsyncResolvable {
     constructor(config) {
+        super();
+
         this.config = config;
 
         this.appStateFilePath = this.config.get("app.stateFile");
     }
 
     /**
-     * @returns {Promise}
+     * @returns {Promise.<ChatApi>}
      */
     login() {
         return new Promise((resolve, reject) => {
@@ -32,7 +37,7 @@ export default class FacebookClient {
 
                 fs.writeFileSync(this.appStateFilePath, JSON.stringify(api.getAppState()));
 
-                return resolve(api);
+                return resolve(new ChatApi(api));
             });
         });
     }
@@ -55,5 +60,13 @@ export default class FacebookClient {
      */
     isAppStateAvailable() {
         return fs.existsSync(this.appStateFilePath);
+    }
+
+
+    /**
+     * @return {Promise.<ChatApi>}
+     */
+    resolve() {
+        return this.login();
     }
 }

@@ -2,16 +2,18 @@ version: '2'
 services:
   bot:
     image: ivkos/facebook-group-chat-bot-app
-#    depends_on:
-#      - mongo
-#    links:
-#      - mongo:mongo
+    depends_on:
+      - mongo
+    links:
+      - mongo:mongo
     volumes:
       - ./data/app:/data/app
+    restart: on-failure:3
 
-#  mongo:
-#    image: mongo:3.2
-#    expose:
-#      - "27017"
-#    volumes:
-#      - ./data/mongo:/data/db
+  mongo:
+    image: mongo:3.2
+    expose:
+      - "27017"
+    restart: on-failure:3
+    volumes:
+      - ./data/db:/data/db

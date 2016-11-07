@@ -5,7 +5,7 @@ set -e
 ./scripts/build-2-app.sh
 
 mkdir -p ./data/app
-mkdir -p ./data/mongo
+mkdir -p ./data/db
 
 printf "\033c" # clear the screen
 docker-compose up -d
