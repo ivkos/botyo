@@ -3,6 +3,7 @@ import FilterModule from "../FilterModule";
 import Configuration from "../../util/Configuration";
 import ChatApi from "../../util/ChatApi";
 import glob from "glob";
+import CommandModule from "../CommandModule";
 
 @Singleton
 @Inject(Configuration, ChatApi)
@@ -19,15 +20,16 @@ export default class CommandExecutorFilter extends FilterModule {
         this.escape = this.config.get("app.commandEscape");
 
         this.commandMap = new Map();
-        glob.sync("../commands/*.js", { cwd: __dirname })
+        glob.sync("../commands/**/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
-            .map(m => {
-                ApplicationIocContainer.registerAsSingleton(m);
-                return ApplicationIocContainer.resolveSingleton(m);
+            .filter(clazz => clazz.prototype instanceof CommandModule)
+            .map(clazz => {
+                ApplicationIocContainer.registerAsSingleton(clazz);
+                return ApplicationIocContainer.resolveSingleton(clazz);
             })
-            .forEach(m => {
-                this.commandMap.set(m.getCommand(), m);
-                console.log("Registered " + this.escape + m.getCommand());
+            .forEach(instance => {
+                this.commandMap.set(instance.getCommand(), instance);
+                console.log(`Registered command ${this.escape}${instance.getCommand()}`);
             });
     }
 
