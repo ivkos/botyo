@@ -19,7 +19,7 @@ export default class CommandExecutorFilter extends FilterModule {
         this.api = api;
         this.escape = this.config.get("app.commandEscape");
 
-        this.commandMap = new Map();
+        this.commandNameToInstanceMap = new Map();
         glob.sync("../commands/**/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
             .filter(clazz => clazz.prototype instanceof CommandModule)
@@ -28,7 +28,7 @@ export default class CommandExecutorFilter extends FilterModule {
                 return ApplicationIocContainer.resolveSingleton(clazz);
             })
             .forEach(instance => {
-                this.commandMap.set(instance.getCommand(), instance);
+                this.commandNameToInstanceMap.set(instance.getCommand(), instance);
                 console.log(`Registered command ${this.escape}${instance.getCommand()}`);
             });
     }
@@ -48,7 +48,7 @@ export default class CommandExecutorFilter extends FilterModule {
         /**
          * @type {CommandModule}
          */
-        const module = this.commandMap.get(commandName);
+        const module = this.commandNameToInstanceMap.get(commandName);
         if (module == undefined) {
             console.log("Could not find module for command " + this.escape + commandName);
             return msg;
@@ -100,7 +100,7 @@ export default class CommandExecutorFilter extends FilterModule {
     getCommandList() {
         let str = "\u{1F527} Command list:\n\n";
 
-        this.commandMap.forEach((module, commandName) => {
+        this.commandNameToInstanceMap.forEach((module, commandName) => {
             str += this.escape + commandName + " - " + module.getDescription() + "\n";
         });
 
