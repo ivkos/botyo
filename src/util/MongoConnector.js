@@ -3,13 +3,13 @@ import Configuration from "./Configuration";
 import MongoClient from "mongodb";
 import Db from "mongodb";
 import Promise from "bluebird";
-import AsyncResolvable from "./AsyncResolvable";
+import AsyncResolvable, { ResolvableResult } from "./AsyncResolvable";
 
 @Singleton
 @Inject(Configuration)
 export default class MongoConnector extends AsyncResolvable {
     constructor(config) {
-        super();
+        super(Db);
 
         this.connectionUrl = config.get("mongo.url");
 
@@ -35,7 +35,7 @@ export default class MongoConnector extends AsyncResolvable {
      * @return {Promise.<Db>}
      */
     resolve() {
-        return this.connect();
+        return ResolvableResult.of(this.getResolvableType(), this.connect());
     }
 
     /**

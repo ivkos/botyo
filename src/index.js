@@ -13,7 +13,7 @@ ApplicationIocContainer.registerInstance(
 );
 
 Promise
-    .all([
+    .resolve([
         MongoConnector,
         FacebookClient,
     ])
@@ -34,6 +34,8 @@ Promise
     .then(deps => deps.map(dep => ApplicationIocContainer.resolve(dep)))
     .then(deps => deps.map(dep => dep.resolve()))
     .all()
-    .then(instances => instances.forEach(i => ApplicationIocContainer.registerInstance(i.constructor, i)))
+    .then(resolvableResults => resolvableResults.forEach(rr =>
+        ApplicationIocContainer.registerInstance(rr.getType(), rr.getResult())
+    ))
     .then(() => ApplicationIocContainer.resolve(Application).start())
     .catch((err) => console.error(err));

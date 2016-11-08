@@ -2,7 +2,7 @@ import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import Configuration from "./Configuration";
 import * as fs from "fs";
 import Promise from "bluebird";
-import AsyncResolvable from "./AsyncResolvable";
+import AsyncResolvable, { ResolvableResult } from "./AsyncResolvable";
 import ChatApi from "./ChatApi";
 
 const login = require("facebook-chat-api");
@@ -11,7 +11,7 @@ const login = require("facebook-chat-api");
 @Inject(Configuration)
 export default class FacebookClient extends AsyncResolvable {
     constructor(config) {
-        super();
+        super(ChatApi);
 
         this.config = config;
 
@@ -67,6 +67,6 @@ export default class FacebookClient extends AsyncResolvable {
      * @return {Promise.<ChatApi>}
      */
     resolve() {
-        return this.login();
+        return ResolvableResult.of(this.getResolvableType(), this.login());
     }
 }
