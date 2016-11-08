@@ -2,18 +2,18 @@ import { dependencies as Inject } from "needlepoint";
 import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
 import Configuration from "../../util/Configuration";
-import Aliases from "../../util/Aliases";
+import Threads from "../../util/Threads";
 import MarkovChain from "markovchain";
 import Bro from "brototype";
 
-@Inject(ChatApi, Configuration, Aliases)
+@Inject(ChatApi, Configuration, Threads)
 export default class QuoteCommand extends CommandModule {
-    constructor(api, config, aliases) {
+    constructor(api, config, threads) {
         super();
 
         this.api = api;
         this.config = config;
-        this.aliases = aliases;
+        this.threads = threads;
 
         this.escape = this.config.get("app.commandEscape");
         this.maxMarkovSentenceWordCount = this.config.get("modules.quote.maxMarkovSentenceWordCount");
@@ -112,6 +112,6 @@ export default class QuoteCommand extends CommandModule {
             return msg.senderID;
         }
 
-        return this.aliases.getUserIdByThreadIdAndAlias(msg.threadID, argsString);
+        return this.threads.getUserIdByThreadIdAndAlias(msg.threadID, argsString);
     }
 }
