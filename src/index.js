@@ -3,7 +3,7 @@ import { container as ApplicationIocContainer } from "needlepoint";
 import Configuration from "./util/Configuration";
 import FacebookClient from "./util/FacebookClient";
 import Application from "./util/Application";
-import MongoConnector from "./util/persistence/MongoConnector";
+import MongoConnector from "./util/MongoConnector";
 import Promise from "bluebird";
 import AsyncResolvable from "./util/AsyncResolvable";
 

@@ -8,12 +8,14 @@ import CommandExecutorFilter from "../modules/filters/CommandExecutorFilter";
 import AutoEmojifyFilter from "../modules/filters/AutoEmojifyFilter";
 import HeIsRisenFilter from "../modules/filters/HeIsRisenFilter";
 import TerminationHandler from "./TerminationHandler";
+import TaskScheduler from "./TaskScheduler";
 import fs from "fs";
 
 @Inject(
     Configuration,
     ChatApi,
     TerminationHandler,
+    TaskScheduler,
     ThreadFilter,
     TrimmingFilter,
     CommandExecutorFilter,
@@ -25,18 +27,20 @@ export default class Application {
      * @param {Configuration} config
      * @param {ChatApi} api
      * @param {TerminationHandler} terminationHandler
+     * @param {TaskScheduler} taskScheduler
      * @param {ThreadFilter} threadFilter
      * @param {TrimmingFilter} trimmingFilter
      * @param {CommandExecutorFilter} commandExecutorFilter
      * @param {AutoEmojifyFilter} autoEmojifyFilter
      * @param {HeIsRisenFilter} heIsRisenFilter
      */
-    constructor(config, api, terminationHandler, threadFilter, trimmingFilter, commandExecutorFilter, autoEmojifyFilter, heIsRisenFilter) {
+    constructor(config, api, terminationHandler, taskScheduler, threadFilter, trimmingFilter, commandExecutorFilter, autoEmojifyFilter, heIsRisenFilter) {
         this.config = config;
         this.bannerText = fs.readFileSync(config.get("app.bannerFile"), { encoding: "utf8" });
 
         this.api = api;
         this.terminationHandler = terminationHandler;
+        this.taskScheduler = taskScheduler;
 
         this.threadFilter = threadFilter;
         this.trimmingFilter = trimmingFilter;
@@ -46,9 +50,10 @@ export default class Application {
     }
 
     start() {
-        this.terminationHandler.register();
-
         console.info(this.bannerText);
+
+        this.terminationHandler.register();
+        this.taskScheduler.start();
 
         return this.api.listen((err, msg) => {
             if (err) return Promise.reject(err);

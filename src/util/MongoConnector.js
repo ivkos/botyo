@@ -1,9 +1,9 @@
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
-import Configuration from "../Configuration";
+import Configuration from "./Configuration";
 import MongoClient from "mongodb";
 import Db from "mongodb";
 import Promise from "bluebird";
-import AsyncResolvable from "../AsyncResolvable";
+import AsyncResolvable from "./AsyncResolvable";
 
 @Singleton
 @Inject(Configuration)

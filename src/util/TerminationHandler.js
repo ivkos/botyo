@@ -1,6 +1,6 @@
 import { dependencies as Inject } from "needlepoint";
 import FacebookClient from "./FacebookClient";
-import MongoConnector from "./persistence/MongoConnector";
+import MongoConnector from "./MongoConnector";
 import Promise from "bluebird";
 import npid from "npid";
 
