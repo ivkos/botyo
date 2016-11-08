@@ -1,8 +1,8 @@
-import CommandModule from "../CommandModule";
-import ChatApi from "../../util/ChatApi";
+import CommandModule from "../../CommandModule";
+import ChatApi from "../../../util/ChatApi";
 import { dependencies as Inject } from "needlepoint";
-import GooglUrlShortener from "../../util/GooglUrlShortener";
-import Configuration from "../../util/Configuration";
+import GooglUrlShortener from "./GooglUrlShortener";
+import Configuration from "../../../util/Configuration";
 import Promise from "bluebird";
 
 @Inject(Configuration, ChatApi, GooglUrlShortener)

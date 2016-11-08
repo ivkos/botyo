@@ -1,6 +1,6 @@
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import googl from "goo.gl";
-import Configuration from "./Configuration";
+import Configuration from "../../../util/Configuration";
 
 @Singleton
 @Inject(Configuration)
