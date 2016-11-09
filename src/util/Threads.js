@@ -10,12 +10,12 @@ export default class Threads {
     }
 
     /**
-     * @return {Set.<number>}
+     * @return {Array.<number>}
      */
     getThreadIds() {
-        const idSet = new Set();
-        this.threadIdToAliasToUserIdMapMap.forEach((v, k) => idSet.add(k));
-        return idSet;
+        const idList = [];
+        this.threadIdToAliasToUserIdMapMap.forEach((v, k) => idList.push(k));
+        return idList;
     }
 
     getUserIdByThreadIdAndAlias(threadId, alias) {

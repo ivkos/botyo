@@ -17,7 +17,7 @@ export default class ThreadFilter extends FilterModule {
 
     filter(msg) {
         const threadId = parseInt(msg.threadID);
-        const shouldListen = this.threadsToListen.has(threadId);
+        const shouldListen = this.threadsToListen.includes(threadId);
 
         if (shouldListen) {
             return Promise.resolve(msg);
