@@ -38,6 +38,7 @@
     "yarn": "^0.16.1"
   },
   "dependencies": {
+    "async": "^2.1.2",
     "bluebird": "^3.4.6",
     "brototype": "letsgetrandy/brototype#0.0.6",
     "facebook-chat-api": "^1.2.0",
