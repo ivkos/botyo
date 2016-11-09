@@ -5,15 +5,17 @@ import Configuration from "../../util/Configuration";
 import Threads from "../../util/Threads";
 import MarkovChain from "markovchain";
 import Bro from "brototype";
+import Db from "mongodb";
 
-@Inject(ChatApi, Configuration, Threads)
+@Inject(ChatApi, Configuration, Threads, Db)
 export default class QuoteCommand extends CommandModule {
-    constructor(api, config, threads) {
+    constructor(api, config, threads, db) {
         super();
 
         this.api = api;
         this.config = config;
         this.threads = threads;
+        this.db = db;
 
         this.escape = this.config.get("app.commandEscape");
         this.maxMarkovSentenceWordCount = this.config.get("modules.quote.maxMarkovSentenceWordCount");
@@ -43,17 +45,20 @@ export default class QuoteCommand extends CommandModule {
             return this.api.sendMessage("Literally who?", threadId);
         }
 
-        const markovPromise = this.api
-            .getThreadInfo(threadId)
-            .then(info => this.api.getThreadHistory(threadId, 0, info.messageCount, null))
-            // TODO Cache messages somewhere
-            .then(history => history
-                .filter(m => targetId == m.senderID.split("fbid:")[1])
-                .filter(m => !!m.body)
-                .filter(m => !this.isCommand(m.body))
-                .filter(m => m.attachments.length == 0)
-                .map(m => m.body)
-            )
+        const dbCollection = this.db.collection(`thread-${threadId}`);
+
+        const messagesInDbCallback = dbCollection.find({
+            "$and": [
+                { senderID: "fbid:" + targetId },
+                { attachments: { $size: 0 } },
+                { body: { $exists: true } },
+                { body: { $ne: "" } },
+                { body: new RegExp("^(?!" + this.escape + ").+$") } // skip messages that start with command symbol
+            ]
+        }).toArray();
+
+        const markovPromise = messagesInDbCallback
+            .then(history => history.map(m => m.body))
             .then(messages => {
                 const chain = new MarkovChain();
                 messages.forEach(m => chain.parse(m));
