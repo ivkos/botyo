@@ -22,7 +22,7 @@ export default class TaskScheduler {
 
     start() {
         this.taskInstanceToIntervalMap.forEach((intervalObj, task, theMap) => {
-            if (task.shouldRunOnStart()) {
+            if (task.shouldExecuteOnStart()) {
                 setImmediate(() => TaskScheduler.executeTask(task));
             }
 
@@ -38,10 +38,20 @@ export default class TaskScheduler {
 
     /**
      * @param {ScheduledTask} taskInstance
-     * @return {*}
      */
     static executeTask(taskInstance) {
+        if (taskInstance.isRunning()) {
+            return console.warn(`Execution of task ${taskInstance.constructor.name} cancelled because it is currently running`);
+        }
+
         console.log(`Executing task ${taskInstance.constructor.name}...`);
-        return taskInstance.execute();
+
+        taskInstance._isRunning = true;
+        taskInstance.execute()
+            .catch(err => console.error(`Execution of task ${taskInstance.constructor.name} failed`, err))
+            .finally(() => {
+                console.log(`Task ${taskInstance.constructor.name} finished`);
+                taskInstance._isRunning = false;
+            });
     }
 }
