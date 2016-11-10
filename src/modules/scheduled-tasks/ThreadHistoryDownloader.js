@@ -26,7 +26,7 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
     }
 
     getInterval() {
-        return 5 * 60 * 1000;
+        return 15 * 60 * 1000;
     }
 
     shouldExecuteOnStart() {
@@ -64,10 +64,16 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
             .spread((createIndex, dbCount, fbCount) => {
                 console.log(`Thread ${threadId}: There are ${dbCount} messages in cache, and ${fbCount} reported by Facebook`);
 
-                if (dbCount >= fbCount) {
+                if (dbCount == fbCount) {
                     return Promise.reject(new ThreadHistoryDownloadCancelledError(
                         `Thread ${threadId}: Message cache is up-to-date`
                     ));
+                }
+
+                if (dbCount > fbCount) {
+                    console.warn(`There are more messages in the cache (${dbCount}) than Facebook reports (${fbCount}). ` +
+                        `Will download the whole chat history.`);
+                    return Promise.resolve(fbCount);
                 }
 
                 const diff = fbCount - dbCount;
