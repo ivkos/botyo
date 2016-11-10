@@ -5,6 +5,10 @@ import { singleton as Singleton } from "needlepoint";
 export default class ChatApi {
     constructor(api) {
         this.api = api;
+
+        this.api.setOptions({
+            logLevel: "warn"
+        });
     }
 
     listen(callback) {
