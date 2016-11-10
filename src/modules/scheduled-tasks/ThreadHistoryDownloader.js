@@ -109,7 +109,7 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
             .catch(err => {
                 // ignore duplicate keys error
                 if (err.code === 11000) {
-                    return console.warn(`Thread ${threadId}: There were ${err.writeErrors.length} duplicate messages`);
+                    return console.warn(`Thread ${threadId}: There were one or more duplicate messages`);
                 }
 
                 return err;
