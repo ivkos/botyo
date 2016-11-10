@@ -1,5 +1,6 @@
 import FilterModule from "../FilterModule";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
+import Db from "mongodb";
 
 @Singleton
 @Inject(Db)
