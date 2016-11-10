@@ -57,16 +57,16 @@ export default class QuoteCommand extends CommandModule {
             ]
         }).toArray();
 
+        let start = 0;
         const markovPromise = messagesInDbCallback
             .then(history => {
-                console.info(`targetId ${targetId}: Building Markov chain based on ${history.length} messages...`);
+                start = Date.now();
                 return history;
             })
             .then(history => history.map(m => m.body))
             .then(messages => {
                 const chain = new MarkovChain();
                 messages.forEach(m => chain.parse(m));
-                console.info(`targetId ${targetId}: Built Markov chain`);
 
                 const randomWordFn = wordList => {
                     const words = Object.keys(wordList);
@@ -74,10 +74,15 @@ export default class QuoteCommand extends CommandModule {
                     return words[randomIndex];
                 };
 
-                return chain
+                const sentence = chain
                     .start(randomWordFn)
                     .end(this.maxMarkovSentenceWordCount)
                     .process();
+
+                const end = Date.now();
+                console.info(`user ${targetId}: Built Markov chain from ${messages.length} messages in ${end - start} ms`);
+
+                return sentence;
             });
 
         const userNamePromise = this.api
