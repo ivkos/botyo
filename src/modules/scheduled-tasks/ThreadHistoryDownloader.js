@@ -62,14 +62,16 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
         return Promise
             .all([createIndexPromise, dbMsgCountPromise, fbMsgCountPromise])
             .spread((createIndex, dbCount, fbCount) => {
-                console.log(`Thread ${threadId}: There are ${dbCount} in db, ${fbCount} from fb`);
+                console.log(`Thread ${threadId}: There are ${dbCount} messages in cache, and ${fbCount} reported by Facebook`);
 
                 if (dbCount >= fbCount) {
-                    return Promise.reject(`Thread ${threadId}: messages in db >= messages from fb`);
+                    return Promise.reject(new ThreadHistoryDownloadCancelledError(
+                        `Thread ${threadId}: Message cache is up-to-date`
+                    ));
                 }
 
                 const diff = fbCount - dbCount;
-                console.log(`Thread ${threadId}: Message cache is ${diff} messages behind.`);
+                console.log(`Thread ${threadId}: Message cache is ${diff} messages behind`);
 
                 return Promise.resolve(diff);
             })
@@ -88,11 +90,7 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
                                 lastTimestamp = parseInt(messages[0].timestamp) - 1;
                                 i++;
 
-                                console.log(`Thread ${threadId}: Downloaded ${downloadedMessages.length}/${msgCountToDownload} messages`);
-
-                                if (messages.length != msgsPerRequest) {
-                                    console.warn(`Thread ${threadId}: Expected ${msgsPerRequest} but got ${messages.length} messages`);
-                                }
+                                console.log(`Thread ${threadId}: Downloaded total ${downloadedMessages.length}/${msgCountToDownload} messages (got ${messages.length})`);
 
                                 done();
                             })
@@ -103,16 +101,26 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
                         return resolve(downloadedMessages);
                     });
                 });
-            }).then(downloadedMessages => dbCollection.insertMany(downloadedMessages, {
+            })
+            .then(downloadedMessages => dbCollection.insertMany(downloadedMessages, {
                 ordered: false // throw everything at the db and see what persists, i.e. don't stop on duplicate keys
             }))
+            .catch(ThreadHistoryDownloadCancelledError, err => {
+                return console.warn(err.message);
+            })
             .catch(err => {
                 // ignore duplicate keys error
                 if (err.code === 11000) {
                     return console.warn(`Thread ${threadId}: There were one or more duplicate messages`);
                 }
 
-                return err;
+                throw err;
             });
+    }
+}
+
+class ThreadHistoryDownloadCancelledError extends Error {
+    constructor(msg) {
+        super(msg);
     }
 }
