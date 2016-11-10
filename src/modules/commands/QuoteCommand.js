@@ -58,10 +58,15 @@ export default class QuoteCommand extends CommandModule {
         }).toArray();
 
         const markovPromise = messagesInDbCallback
+            .then(history => {
+                console.info(`targetId ${targetId}: Building Markov chain based on ${history.length} messages...`);
+                return history;
+            })
             .then(history => history.map(m => m.body))
             .then(messages => {
                 const chain = new MarkovChain();
                 messages.forEach(m => chain.parse(m));
+                console.info(`targetId ${targetId}: Built Markov chain`);
 
                 const randomWordFn = wordList => {
                     const words = Object.keys(wordList);
