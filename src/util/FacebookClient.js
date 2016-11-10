@@ -31,7 +31,22 @@ export default class FacebookClient extends AsyncResolvable {
             };
 
             login(loginOptions, (err, api) => {
-                if (err) return reject(err);
+                if (err) {
+                    switch (err.error) {
+                        case 'login-approval': {
+                            // TODO Externalize in config
+                            const waitTime = 30;
+
+                            console.log(`You have ${waitTime}s to approve the login.`);
+                            setTimeout(() => err.continue(), waitTime * 1000);
+
+                            return;
+                        }
+
+                        default:
+                            return reject(err);
+                    }
+                }
 
                 this.api = api;
 
