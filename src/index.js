@@ -32,7 +32,7 @@ Promise
             : Promise.reject("One or more of the dependencies could not be resolved.");
     })
     .then(deps => deps.map(dep => ApplicationIocContainer.resolve(dep)))
-    .then(deps => deps.map(dep => dep.resolve()))
+    .then(deps => deps.map(dep => dep.getResolvableResult()))
     .all()
     .then(resolvableResults => resolvableResults.forEach(rr =>
         ApplicationIocContainer.registerInstance(rr.getType(), rr.getResult())

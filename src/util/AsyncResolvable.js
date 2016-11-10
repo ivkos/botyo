@@ -12,17 +12,17 @@ export default class AsyncResolvable {
     }
 
     /**
-     * @return {Promise.<ResolvableResult.<T>>}
+     * @return {Promise.<T>}
      */
     resolve() {
         return Promise.reject("Not implemented");
     }
 
     /**
-     * @return {T}
+     * @return {Promise.<ResolvableResult.<T>>}
      */
-    getResolvableType() {
-        return this._resolvableType;
+    getResolvableResult() {
+        return ResolvableResult.of(this._resolvableType, this.resolve());
     }
 }
 
