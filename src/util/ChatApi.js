@@ -42,4 +42,8 @@ export default class ChatApi {
     getUserInfo(ids) {
         return Promise.promisify(this.api.getUserInfo)(ids);
     }
+
+    getCurrentUserId() {
+        return this.api.getCurrentUserID();
+    }
 }
