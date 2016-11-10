@@ -45,17 +45,24 @@ export default class QuoteCommand extends CommandModule {
             return this.api.sendMessage("Literally who?", threadId);
         }
 
-        const dbCollection = this.db.collection(`thread-${threadId}`);
+        const filterList = [];
+        if (targetId !== -1) {
+            filterList.push({ senderID: "fbid:" + targetId });
+        } else { // all
+            filterList.push({ senderID: { $ne: "fbid:" + this.api.getCurrentUserId() } }); // skip messages by the bot
+        }
 
-        const messagesInDbCallback = dbCollection.find({
-            "$and": [
-                { senderID: "fbid:" + targetId },
-                { attachments: { $size: 0 } },
-                { body: { $exists: true } },
-                { body: { $ne: "" } },
-                { body: new RegExp("^(?!" + this.escape + ").+$") } // skip messages that start with command symbol
-            ]
-        }).toArray();
+        filterList.push(
+            { attachments: { $size: 0 } },
+            { body: { $exists: true } },
+            { body: { $ne: "" } },
+            { body: new RegExp("^(?!" + this.escape + ").+$") } // skip messages that start with command symbol
+        );
+
+        const messagesInDbCallback = this.db
+            .collection(`thread-${threadId}`)
+            .find({ "$and": filterList })
+            .toArray();
 
         let start = 0;
         const markovPromise = messagesInDbCallback
@@ -80,25 +87,30 @@ export default class QuoteCommand extends CommandModule {
                     .process();
 
                 const end = Date.now();
-                console.info(`user ${targetId}: Built Markov chain from ${messages.length} messages in ${end - start} ms`);
+                console.info(`targetId ${targetId}: Built Markov chain from ${messages.length} messages in ${end - start} ms`);
 
                 return sentence;
             });
 
-        const userNamePromise = this.api
-            .getUserInfo(targetId)
-            .then(info => {
-                const bro = new Bro(info);
-                const prop = targetId + ".name";
+        let userNamePromise;
+        if (targetId !== -1) {
+            userNamePromise = this.api
+                .getUserInfo(targetId)
+                .then(info => {
+                    const bro = new Bro(info);
+                    const prop = targetId + ".name";
 
-                if (!bro.doYouEven(prop)) {
-                    console.error("targetId", targetId);
-                    console.error("userInfo", info);
-                    throw new Error("Could not get name");
-                }
+                    if (!bro.doYouEven(prop)) {
+                        console.error("targetId", targetId);
+                        console.error("userInfo", info);
+                        throw new Error("Could not get name");
+                    }
 
-                return bro.iCanHaz(prop);
-            });
+                    return bro.iCanHaz(prop);
+                });
+        } else { // all
+            userNamePromise = Promise.resolve("\u{1F464}")
+        }
 
         return Promise
             .all([markovPromise, userNamePromise])
@@ -125,6 +137,10 @@ export default class QuoteCommand extends CommandModule {
 
         if (argsString == "me") {
             return msg.senderID;
+        }
+
+        if (argsString == "all" || argsString == "*") {
+            return -1;
         }
 
         return this.threads.getUserIdByThreadIdAndAlias(msg.threadID, argsString);
