@@ -4,6 +4,7 @@ import ChatApi from "./ChatApi";
 import Configuration from "./Configuration";
 import ThreadFilter from "../modules/filters/ThreadFilter";
 import TrimmingFilter from "../modules/filters/TrimmingFilter";
+import MessageDownloaderFilter from "../modules/filters/MessageDownloaderFilter";
 import CommandExecutorFilter from "../modules/filters/CommandExecutorFilter";
 import AutoEmojifyFilter from "../modules/filters/AutoEmojifyFilter";
 import HeIsRisenFilter from "../modules/filters/HeIsRisenFilter";
@@ -18,6 +19,7 @@ import fs from "fs";
     TaskScheduler,
     ThreadFilter,
     TrimmingFilter,
+    MessageDownloaderFilter,
     CommandExecutorFilter,
     AutoEmojifyFilter,
     HeIsRisenFilter
@@ -30,11 +32,12 @@ export default class Application {
      * @param {TaskScheduler} taskScheduler
      * @param {ThreadFilter} threadFilter
      * @param {TrimmingFilter} trimmingFilter
+     * @param {MessageDownloaderFilter} messageDownloaderFilter
      * @param {CommandExecutorFilter} commandExecutorFilter
      * @param {AutoEmojifyFilter} autoEmojifyFilter
      * @param {HeIsRisenFilter} heIsRisenFilter
      */
-    constructor(config, api, terminationHandler, taskScheduler, threadFilter, trimmingFilter, commandExecutorFilter, autoEmojifyFilter, heIsRisenFilter) {
+    constructor(config, api, terminationHandler, taskScheduler, threadFilter, trimmingFilter, messageDownloaderFilter, commandExecutorFilter, autoEmojifyFilter, heIsRisenFilter) {
         this.config = config;
         this.bannerText = fs.readFileSync(config.get("app.bannerFile"), { encoding: "utf8" });
 
@@ -44,6 +47,7 @@ export default class Application {
 
         this.threadFilter = threadFilter;
         this.trimmingFilter = trimmingFilter;
+        this.messageDownloaderFilter = messageDownloaderFilter;
         this.commandExecutorFilter = commandExecutorFilter;
         this.autoEmojifyFilter = autoEmojifyFilter;
         this.heIsRisenFilter = heIsRisenFilter;
@@ -61,6 +65,7 @@ export default class Application {
             return Promise.resolve(msg)
                 .then(msg => this.threadFilter.filter(msg))
                 .then(msg => this.trimmingFilter.filter(msg))
+                .then(msg => this.messageDownloaderFilter.filter(msg))
                 .then(msg => this.commandExecutorFilter.filter(msg))
                 .then(msg => this.autoEmojifyFilter.filter(msg))
                 .then(msg => this.heIsRisenFilter.filter(msg));
