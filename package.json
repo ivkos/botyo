@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rimraf build/",
     "build": "babel src --out-dir build/ --source-maps",
-    "prestart": "yarn run build",
+    "prestart": "npm run build",
     "start": "node build/index.js"
   },
   "repository": {
@@ -40,7 +40,7 @@
     "glob": "^7.1.1",
     "goo.gl": "^0.1.4",
     "google-images": "^2.0.0",
-    "markovchain": "^1.0.2",
+    "markovski": "git://github.com/ivkos/markovski.git",
     "mime-types": "^2.1.12",
     "moment": "^2.15.2",
     "mongodb": "^2.2.11",
@@ -49,7 +49,6 @@
     "request": "^2.75.0",
     "rimraf": "^2.5.4",
     "tmp": "0.0.29",
-    "yamljs": "^0.2.8",
-    "yarn": "^0.16.1"
+    "yamljs": "^0.2.8"
   }
 }

@@ -3,7 +3,7 @@ import CommandModule from "../CommandModule";
 import ChatApi from "../../util/ChatApi";
 import Configuration from "../../util/Configuration";
 import Threads from "../../util/Threads";
-import MarkovChain from "markovchain";
+import Markovski from "markovski";
 import Bro from "brototype";
 import Db from "mongodb";
 
@@ -19,6 +19,7 @@ export default class QuoteCommand extends CommandModule {
 
         this.escape = this.config.get("app.commandEscape");
         this.maxMarkovSentenceWordCount = this.config.get("modules.quote.maxMarkovSentenceWordCount");
+        this.markovModelOrder = this.config.get("modules.quote.markovModelOrder");
     }
 
     getCommand() {
@@ -72,19 +73,12 @@ export default class QuoteCommand extends CommandModule {
             })
             .then(history => history.map(m => m.body))
             .then(messages => {
-                const chain = new MarkovChain();
-                messages.forEach(m => chain.parse(m));
+                const markovski = new Markovski(this.markovModelOrder);
+                messages.forEach(m => markovski.train(m));
 
-                const randomWordFn = wordList => {
-                    const words = Object.keys(wordList);
-                    const randomIndex = Math.floor(Math.random() * words.length);
-                    return words[randomIndex];
-                };
-
-                const sentence = chain
-                    .start(randomWordFn)
-                    .end(this.maxMarkovSentenceWordCount)
-                    .process();
+                const sentence = markovski
+                    .endWhen(this.maxMarkovSentenceWordCount)
+                    .generate();
 
                 const end = Date.now();
                 console.info(`targetId ${targetId}: Built Markov chain from ${messages.length} messages in ${end - start} ms`);

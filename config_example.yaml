@@ -42,3 +42,4 @@ modules:
 
   quote:
     maxMarkovSentenceWordCount: 20
+    markovModelOrder: 2
