@@ -76,9 +76,40 @@ export default class ChatApi {
         return Promise.promisify(this.api.getThreadHistory)(threadId, start, end, timestamp);
     }
 
-    // TODO Use promises
-    sendTypingIndicator(threadId, callback) {
-        return this.api.sendTypingIndicator(threadId, callback);
+    /**
+     * Ends the typing indicator.
+     *
+     * @callback endFn
+     * @return {Promise} empty promise
+     */
+    /**
+     * Sends a typing indicator.
+     *
+     * @param {number} threadId
+     * @return {Promise.<endFn>} promise with a function that ends the typing indicator when called
+     */
+    sendTypingIndicator(threadId) {
+        return new Promise((resolve, reject) => {
+            const endFn = this.api.sendTypingIndicator(threadId, (err) => {
+                if (err) return reject(err);
+
+                return resolve(this._endTypingIndicator(endFn));
+            })
+        });
+    }
+
+    /**
+     * @param {function} originalEndFn
+     * @private
+     */
+    _endTypingIndicator(originalEndFn) {
+        return () => new Promise((resolve, reject) => {
+            originalEndFn((err) => {
+                if (err) return reject(err);
+
+                return resolve();
+            });
+        });
     }
 
     /**

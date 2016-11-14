@@ -34,24 +34,17 @@ export default class WhoDisCommand extends CommandModule {
     }
 
     execute(msg, argsString) {
-        let endFn;
+        let endTypingIndicator = () => {};
 
-        return this.api.markAsRead(msg.threadID)
-            .then((err) => {
-                // Error is not fatal, don't break the chain
-                if (err) console.error(err);
-
+        return this.api
+            .markAsRead(msg.threadID)
+            .then(() => this.api.sendTypingIndicator(msg.threadID))
+            .then(endFn => endTypingIndicator = endFn)
+            .catch(err => {
+                console.warn(err);
                 return Promise.resolve();
             })
-            .then(() => new Promise((resolve) => {
-                endFn = this.api.sendTypingIndicator(msg.threadID, (err) => {
-                    // ditto, non-fatal error
-                    if (err) console.error(err);
-
-                    return resolve();
-                });
-            }))
-            .then(() => this.api.getThreadHistory(msg.threadID, 0, this.recentMessagesCount, null))
+            .then(() => this.api.getThreadHistory(msg.threadID, 0, this.recentMessagesCount))
             .then(history => {
                 const photos = history
                     .filter(m => m.attachments.length > 0)
@@ -74,9 +67,7 @@ export default class WhoDisCommand extends CommandModule {
             .then(url => this.getResultWithShortUrls(url))
             .then(resultText => this.api.sendMessage(resultText, msg.threadID))
             .finally(() => {
-                if (typeof endFn == "function") {
-                    endFn();
-                }
+                endTypingIndicator();
             });
     }
 

@@ -51,14 +51,19 @@ export default class ShowMeCommand extends CommandModule {
     }
 
     execute(msg, query) {
-        let endFn;
+        let endTypingIndicator = () => {};
         let tempFilesList = [];
 
         const opts = this.parseArgsString(query);
 
-        return new Promise(resolve => {
-            endFn = this.api.sendTypingIndicator(msg.threadID, () => resolve())
-        })
+        return this.api
+            .markAsRead(msg.threadID)
+            .then(() => this.api.sendTypingIndicator(msg.threadID))
+            .then(endFn => endTypingIndicator = endFn)
+            .catch(err => {
+                console.warn(err);
+                return Promise.resolve();
+            })
             .then(() => this.getImageUrls(opts.query, opts.imageCount))
             .catch(err => {
                 this.api.sendMessage("Sorry, something went wrong with the Google Images query. \u{1F615}", msg.threadID);
@@ -94,10 +99,7 @@ export default class ShowMeCommand extends CommandModule {
                 throw err;
             })
             .finally(() => {
-                if (typeof endFn == "function") {
-                    endFn();
-                }
-
+                endTypingIndicator();
                 tempFilesList.forEach(path => fs.unlink(path));
             });
     }
