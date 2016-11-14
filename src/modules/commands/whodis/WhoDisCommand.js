@@ -61,8 +61,15 @@ export default class WhoDisCommand extends CommandModule {
                 }
 
                 const lastPhoto = photos[0].attachments[0];
+                const url = lastPhoto.hiresUrl || lastPhoto.previewUrl || lastPhoto.thumbnailUrl;
 
-                return lastPhoto.hiresUrl;
+                if (!url) return Promise.reject(new Error("Could not get photo's URL"));
+
+                return url;
+            })
+            .catch(err => {
+                this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
+                throw err;
             })
             .then(url => this.getResultWithShortUrls(url))
             .then(resultText => this.api.sendMessage(resultText, msg.threadID))
