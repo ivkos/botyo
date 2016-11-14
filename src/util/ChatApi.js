@@ -46,4 +46,8 @@ export default class ChatApi {
     getCurrentUserId() {
         return this.api.getCurrentUserID();
     }
+
+    handleMessageRequest(threadId, isAccepted) {
+        return Promise.promisify(this.api.handleMessageRequest)(threadId, isAccepted);
+    }
 }
