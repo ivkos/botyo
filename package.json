@@ -48,6 +48,7 @@
     "npid": "^0.4.0",
     "request": "^2.75.0",
     "rimraf": "^2.5.4",
+    "string-similarity": "^1.1.0",
     "tmp": "0.0.29",
     "yamljs": "^0.2.8"
   }
