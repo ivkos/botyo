@@ -1,20 +1,21 @@
-import CommandModule from "../../CommandModule";
-import ChatApi from "../../../util/ChatApi";
+import CommandModule from "../CommandModule";
+import ChatApi from "../../util/ChatApi";
 import { dependencies as Inject } from "needlepoint";
-import GooglUrlShortener from "./GooglUrlShortener";
-import Configuration from "../../../util/Configuration";
+import Configuration from "../../util/Configuration";
 import Promise from "bluebird";
+import googl from "goo.gl";
 
-@Inject(Configuration, ChatApi, GooglUrlShortener)
+@Inject(Configuration, ChatApi)
 export default class WhoDisCommand extends CommandModule {
-    constructor(config, api, googl) {
+    constructor(config, api) {
         super();
 
         this.config = config;
         this.api = api;
-        this.googl = googl;
 
-        this.recentMessagesCount = this.config.get("modules.whodis.recentMessagesCount");
+        this.recentMessagesCount = config.getModuleConfig(this, "recentMessagesCount");
+
+        googl.setKey(config.getModuleConfig(this, "googlApiKey"));
     }
 
     getCommand() {
@@ -80,9 +81,9 @@ export default class WhoDisCommand extends CommandModule {
 
     getResultWithShortUrls(url) {
         return Promise.all([
-            this.googl.shorten(this.getGoogleUrl(url)),
-            this.googl.shorten(this.getBingUrl(url)),
-            this.googl.shorten(this.getTinEyeUrl(url))
+            googl.shorten(this.getGoogleUrl(url)),
+            googl.shorten(this.getBingUrl(url)),
+            googl.shorten(this.getTinEyeUrl(url))
         ]).then(result => {
             const googleShortUrl = result[0];
             const bingShortUrl = result[1];

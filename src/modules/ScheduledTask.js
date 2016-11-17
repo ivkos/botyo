@@ -6,20 +6,6 @@ export default class ScheduledTask {
     }
 
     /**
-     * @return {number}
-     */
-    getInterval() {
-        return 60 * 1000;
-    }
-
-    /**
-     * @return {boolean}
-     */
-    shouldExecuteOnStart() {
-        return false;
-    }
-
-    /**
      * @return {boolean}
      */
     isRunning() {

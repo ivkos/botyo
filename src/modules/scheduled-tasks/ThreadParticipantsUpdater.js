@@ -18,14 +18,6 @@ export default class ThreadParticipantsUpdater extends ScheduledTask {
         this.api = api;
     }
 
-    getInterval() {
-        return 1 * 60 * 1000;
-    }
-
-    shouldExecuteOnStart() {
-        return true;
-    }
-
     execute() {
         const threadInfosPromise = this.threads
             .getThreadIds()

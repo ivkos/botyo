@@ -13,13 +13,12 @@ export default class QuoteCommand extends CommandModule {
         super();
 
         this.api = api;
-        this.config = config;
         this.threads = threads;
         this.db = db;
 
-        this.escape = this.config.get("app.commandEscape");
-        this.maxMarkovSentenceWordCount = this.config.get("modules.quote.maxMarkovSentenceWordCount");
-        this.markovModelOrder = this.config.get("modules.quote.markovModelOrder");
+        this.escape = config.get("app.commandEscape");
+        this.maxMarkovSentenceWordCount = config.getModuleConfig(this, "maxMarkovSentenceWordCount");
+        this.markovModelOrder = config.getModuleConfig(this, "markovModelOrder");
     }
 
     getCommand() {
@@ -116,10 +115,6 @@ export default class QuoteCommand extends CommandModule {
                     + "– " + name;
             })
             .then(quote => this.api.sendMessage(quote, threadId));
-    }
-
-    isCommand(body) {
-        return body.startsWith(this.escape);
     }
 
     getTargetIdFromArgsString(msg, argsString) {

@@ -24,9 +24,15 @@ export default class CommandExecutorFilter extends FilterModule {
             .map(fn => require(fn).default)
             .filter(clazz => clazz.prototype instanceof CommandModule)
             .map(clazz => {
+                if (!config.isModuleEnabled(clazz.prototype)) {
+                    console.info(`Command ${clazz.constructor.name} is disabled`);
+                    return null;
+                }
+
                 ApplicationIocContainer.registerAsSingleton(clazz);
                 return ApplicationIocContainer.resolveSingleton(clazz);
             })
+            .filter(i => i !== null)
             .forEach(instance => {
                 this.commandNameToInstanceMap.set(instance.getCommand(), instance);
                 console.log(`Registered command ${this.escape}${instance.getCommand()}`);

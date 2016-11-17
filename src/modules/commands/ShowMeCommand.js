@@ -16,15 +16,14 @@ export default class ShowMeCommand extends CommandModule {
     constructor(config, api) {
         super();
 
-        this.config = config;
         this.api = api;
 
-        this.defaultImageCount = this.config.get("modules.showme.defaultImageCount");
-        this.maxImageCount = this.config.get("modules.showme.maxImageCount");
+        this.defaultImageCount = config.getModuleConfig(this, "defaultImageCount");
+        this.maxImageCount = config.getModuleConfig(this, "maxImageCount");
 
         this.imagesClient = new ImagesClient(
-            this.config.get("modules.showme.cseId"),
-            this.config.get("modules.showme.cseApiKey")
+            config.getModuleConfig(this, "cseId"),
+            config.getModuleConfig(this, "cseApiKey")
         );
     }
 

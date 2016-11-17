@@ -25,14 +25,6 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
         this.threads = threads;
     }
 
-    getInterval() {
-        return 15 * 60 * 1000;
-    }
-
-    shouldExecuteOnStart() {
-        return true;
-    }
-
     execute() {
         const threadIds = this.threads.getThreadIds();
 

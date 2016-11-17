@@ -17,14 +17,6 @@ export default class MessageRequestAcceptor extends ScheduledTask {
         this.threads = threads;
     }
 
-    getInterval() {
-        return 5 * 60 * 1000;
-    }
-
-    shouldExecuteOnStart() {
-        return true;
-    }
-
     execute() {
         const promises = this.threads.getThreadIds().map(id => this.api.handleMessageRequest(id, true));
 

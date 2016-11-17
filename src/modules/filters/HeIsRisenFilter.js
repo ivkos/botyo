@@ -12,16 +12,21 @@ export default class HeIsRisenFilter extends FilterModule {
         super();
 
         this.api = api;
-        this.config = config;
 
-        this.timeLimit = this.config.get("modules.heIsRisen.timeLimit");
-        this.msgLimit = this.config.get("modules.heIsRisen.msgLimit");
+        this.timeLimit = config.getModuleConfig(this, "timeLimit");
+        this.msgLimit = config.getModuleConfig(this, "msgLimit");
 
-        this.watchEveryone = this.config.get("modules.heIsRisen.watchEveryone");
-        this.watchList = this.config.get("modules.heIsRisen.watchList");
+        this.watchEveryone = config.getModuleConfig(this, "watchEveryone");
+        this.watchList = config.getModuleConfig(this, "watchList");
+
+        this.isEnabled = config.isModuleEnabled(this);
     }
 
     filter(msg) {
+        if (!this.isEnabled) {
+            return msg;
+        }
+
         if (!this.isOnWatchList(msg.senderID) && !this.watchEveryone) {
             return msg;
         }
