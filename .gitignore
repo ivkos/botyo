@@ -1,9 +1,8 @@
-build/
-data/
-
-node_modules/
-
 .idea/
 
+build/
+data/
+node_modules/
+
 config.yaml
-appstate.json
+app.pid

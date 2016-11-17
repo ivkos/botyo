@@ -1,5 +1,14 @@
 .git/
-build/
-node_modules/
+.gitignore
 .idea/
+
+build/
 data/
+node_modules/
+
+app.pid
+config_example.yaml
+LICENSE
+README.md
+run.sh
+stop.sh
