@@ -3,6 +3,9 @@ account:
   email: FACEBOOK_EMAIL
   password: FACEBOOK_PASSWORD
 
+mongo:
+  url: "mongodb://mongo:27017/facebook-group-chat-bot"
+
 # Threads to listen to
 threads:
   - 162123511236172
