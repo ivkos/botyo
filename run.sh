@@ -2,7 +2,7 @@
 
 set -e
 
-./scripts/build-2-app.sh
+./docker/build-2-app.sh
 
 mkdir -p ./data/app
 mkdir -p ./data/db
