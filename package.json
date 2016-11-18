@@ -1,7 +1,7 @@
 {
-  "name": "facebook-group-chat-bot",
+  "name": "botyo",
   "version": "1.0.0",
-  "description": "Facebook Group Chat Bot",
+  "description": "Botyo is a modular bot designed for group chat rooms on Facebook",
   "main": "index.js",
   "scripts": {
     "prebuild": "rimraf build/",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ivkos/facebook-group-chat-bot.git"
+    "url": "git+https://github.com/ivkos/botyo.git"
   },
   "keywords": [
     "facebook",
@@ -26,9 +26,9 @@
   },
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ivkos/facebook-group-chat-bot/issues"
+    "url": "https://github.com/ivkos/botyo/issues"
   },
-  "homepage": "https://github.com/ivkos/facebook-group-chat-bot#readme",
+  "homepage": "https://github.com/ivkos/botyo#readme",
   "dependencies": {
     "async": "^2.1.2",
     "babel-cli": "^6.16.0",

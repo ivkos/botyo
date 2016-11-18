@@ -1,4 +1,4 @@
-FROM    ivkos/facebook-group-chat-bot-backbone
+FROM    ivkos/botyo-backbone
 
 ADD     package.json /app/
 

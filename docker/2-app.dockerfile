@@ -1,4 +1,4 @@
-FROM    ivkos/facebook-group-chat-bot-node-deps
+FROM    ivkos/botyo-node-deps
 
 ADD     . /app
 

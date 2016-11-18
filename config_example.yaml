@@ -4,7 +4,7 @@ account:
   password: FACEBOOK_PASSWORD
 
 mongo:
-  url: "mongodb://mongo:27017/facebook-group-chat-bot"
+  url: "mongodb://mongo:27017/botyo"
 
 # Threads to listen to
 threads:
