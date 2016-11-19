@@ -1,7 +1,7 @@
 version: '2'
 services:
   bot:
-    image: ivkos/facebook-group-chat-bot-app
+    image: ivkos/botyo
     depends_on:
       - mongo
     links:
