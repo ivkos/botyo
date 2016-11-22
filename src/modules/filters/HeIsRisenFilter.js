@@ -18,15 +18,9 @@ export default class HeIsRisenFilter extends FilterModule {
 
         this.watchEveryone = config.getModuleConfig(this, "watchEveryone");
         this.watchList = config.getModuleConfig(this, "watchList");
-
-        this.isEnabled = config.isModuleEnabled(this);
     }
 
     filter(msg) {
-        if (!this.isEnabled) {
-            return msg;
-        }
-
         if (!this.isOnWatchList(msg.senderID) && !this.watchEveryone) {
             return msg;
         }

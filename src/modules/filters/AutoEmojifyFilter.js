@@ -1,23 +1,21 @@
 import FilterModule from "../FilterModule";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import ChatApi from "../../util/ChatApi";
-import Configuration from "../../util/Configuration";
 import Emojify from "../../util/Emojify";
 
 const emojifiablePattern = /\b((?:[A-Z]\s){2,}[A-Z])\b/g;
 
 @Singleton
-@Inject(ChatApi, Configuration)
+@Inject(ChatApi)
 export default class AutoEmojifyFilter extends FilterModule {
-    constructor(api, config) {
+    constructor(api) {
         super();
 
         this.api = api;
-        this.isEnabled = config.isModuleEnabled(this);
     }
 
     filter(msg) {
-        if (!this.isEnabled || !msg.body) return msg;
+        if (!msg.body) return msg;
 
         if (AutoEmojifyFilter.shouldEmojify(msg.body)) {
             const response = msg.body.replace(emojifiablePattern, match => Emojify.emojify(match));

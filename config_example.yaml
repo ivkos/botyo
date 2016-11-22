@@ -24,6 +24,15 @@ app:
   bannerFile: banner.txt              # file contents to print after listening has started
   commandEscape: "#"                  # character all commands to the bot should be preceded with (e.g. #ping)
 
+# List of filters each message gets passed through. Filters are applied in the order they are listed here.
+# Not listing a filter here disables it by not passing messages through it
+filter-chain:
+  - ThreadFilter             # checks if message is coming from a thread the bot is listening to
+  - TrimmingFilter           # trims message's body
+  - MessageDownloaderFilter  # saves a copy of each received message in the database
+  - CommandExecutorFilter    # parses each message for commands and executes them
+  - AutoEmojifyFilter        # scans for emojifiable parts (e.g. "E X A M P L E"), emojifies them, and responds
+  - HeIsRisenFilter          # says "<name> is risen!" if a person hasn't sent messages in a while (see config below)
 
 modules:
   commands:
@@ -71,18 +80,9 @@ modules:
 
 
   filters:
-    # Emojifies parts of the message that are emojifiable (e.g. "E X A M P L E")
-    AutoEmojifyFilter:
-      enable: true
-
-    # Saves a copy of each received message in the database
-    MessageDownloaderFilter:
-      enable: true
-
     # Replies "<name> is risen!" when a person on the watch list
     # sends a message for the first time in the last 'timeLimit' minutes or 'msgLimit' messages
     HeIsRisenFilter:
-      enable: true
       timeLimit: 1080                   # how long the user must have been inactive (in minutes)
       msgLimit: 200                     # how many messages to look back on for the user
       watchEveryone: true               # whether to watch everyone in the chat

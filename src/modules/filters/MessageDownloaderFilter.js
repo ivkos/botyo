@@ -1,21 +1,17 @@
 import FilterModule from "../FilterModule";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import Db from "mongodb";
-import Configuration from "../../util/Configuration";
 
 @Singleton
-@Inject(Db, Configuration)
+@Inject(Db)
 export default class MessageDownloaderFilter extends FilterModule {
-    constructor(db, config) {
+    constructor(db) {
         super();
 
         this.db = db;
-        this.isEnabled = config.isModuleEnabled(this);
     }
 
     filter(msg) {
-        if (!this.isEnabled) return msg;
-
         const threadId = parseInt(msg.threadID);
 
         this.db
