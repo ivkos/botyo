@@ -6,6 +6,9 @@ import Threads from "../../util/Threads";
 import Markovski from "markovski";
 import Bro from "brototype";
 import Db from "mongodb";
+import natural from "natural";
+import emojiRegex from "emoji-regex";
+import emoticonToEmojiMap from "emoji-emoticon-to-unicode";
 
 @Inject(ChatApi, Configuration, Threads, Db)
 export default class QuoteCommand extends CommandModule {
@@ -72,12 +75,9 @@ export default class QuoteCommand extends CommandModule {
             })
             .then(history => history.map(m => m.body))
             .then(messages => {
-                const markovski = new Markovski(this.markovModelOrder);
+                const markovski = this.createMarkovski();
                 messages.forEach(m => markovski.train(m));
-
-                const sentence = markovski
-                    .endWhen(this.maxMarkovSentenceWordCount)
-                    .generate();
+                const sentence = markovski.generate();
 
                 const end = Date.now();
                 console.info(`targetId ${targetId}: Built Markov chain from ${messages.length} messages in ${end - start} ms`);
@@ -133,5 +133,25 @@ export default class QuoteCommand extends CommandModule {
         }
 
         return this.threads.getUserIdByThreadIdAndAlias(msg.threadID, argsString);
+    }
+
+    /**
+     *
+     * @return {Markovski}
+     */
+    createMarkovski() {
+        const tokenizer = new natural.RegexpTokenizer({
+            pattern: /[^A-Za-zА-Яа-я0-9_\-*@%$]+/
+        });
+
+        return new Markovski(this.markovModelOrder)
+            .sentenceToWordsSplitter(sentence => sentence
+                .split(/\s/)
+                .map(w => w.trim())
+                .filter(w => w.length > 0)
+                .map(w => emoticonToEmojiMap[w] ? String.fromCodePoint(parseInt(emoticonToEmojiMap[w], 16)) : w)
+                .map(w => emojiRegex().test(w) ? w : tokenizer.tokenize(w))
+                .reduce((arr, val) => Array.isArray(val) ? arr.concat(val) : (arr.push(val), arr), []))
+            .endWhen(this.maxMarkovSentenceWordCount);
     }
 }
