@@ -50,7 +50,7 @@ export default class QuoteCommand extends CommandModule {
 
         const sentencePromise = this.getMessages(threadId, targetId)
             .then(history => history.map(m => m.body))
-            .then(this.buildMarkovSentence);
+            .then(messages => this.buildMarkovSentence(messages));
 
         const namePromise = targetId === -1
             ? Promise.resolve("\u{1F464}")
