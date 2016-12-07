@@ -48,75 +48,29 @@ export default class QuoteCommand extends CommandModule {
             return this.api.sendMessage("Literally who?", threadId);
         }
 
-        const filterList = [];
-        if (targetId !== -1) {
-            filterList.push({ senderID: "fbid:" + targetId });
-        } else { // all
-            filterList.push({ senderID: { $ne: "fbid:" + this.api.getCurrentUserId() } }); // skip messages by the bot
-        }
-
-        filterList.push(
-            { attachments: { $size: 0 } },
-            { body: { $exists: true } },
-            { body: { $ne: "" } },
-            { body: new RegExp("^(?!" + this.escape + ").+$") } // skip messages that start with command symbol
-        );
-
-        const messagesInDbCallback = this.db
-            .collection(`thread-${threadId}`)
-            .find({ "$and": filterList })
-            .toArray();
-
-        let start = 0;
-        const markovPromise = messagesInDbCallback
-            .then(history => {
-                start = Date.now();
-                return history;
-            })
+        const sentencePromise = this.getMessages(threadId, targetId)
             .then(history => history.map(m => m.body))
-            .then(messages => {
-                const markovski = this.createMarkovski();
-                messages.forEach(m => markovski.train(m));
-                const sentence = markovski.generate();
+            .then(this.buildMarkovSentence);
 
-                const end = Date.now();
-                console.info(`targetId ${targetId}: Built Markov chain from ${messages.length} messages in ${end - start} ms`);
-
-                return sentence;
-            });
-
-        let userNamePromise;
-        if (targetId !== -1) {
-            userNamePromise = this.api
-                .getUserInfo(targetId)
-                .then(info => {
-                    const bro = new Bro(info);
-                    const prop = targetId + ".name";
-
-                    if (!bro.doYouEven(prop)) {
-                        console.error("targetId", targetId);
-                        console.error("userInfo", info);
-                        throw new Error("Could not get name");
-                    }
-
-                    return bro.iCanHaz(prop);
-                });
-        } else { // all
-            userNamePromise = Promise.resolve("\u{1F464}")
-        }
+        const namePromise = targetId === -1
+            ? Promise.resolve("\u{1F464}")
+            : this.getParticipantName(targetId);
 
         return Promise
-            .all([markovPromise, userNamePromise])
-            .then(result => {
-                const markovSentence = result[0];
-                const name = result[1];
-
-                return "“" + markovSentence + "”" + "\n"
+            .all([sentencePromise, namePromise])
+            .then(([sentence, name]) => {
+                return "“" + sentence + "”" + "\n"
                     + "– " + name;
             })
             .then(quote => this.api.sendMessage(quote, threadId));
     }
 
+    /**
+     * @param msg
+     * @param argsString
+     * @return {number|undefined}
+     * @private
+     */
     getTargetIdFromArgsString(msg, argsString) {
         if (!argsString || argsString.length == 0) {
             return msg.senderID;
@@ -136,8 +90,8 @@ export default class QuoteCommand extends CommandModule {
     }
 
     /**
-     *
      * @return {Markovski}
+     * @private
      */
     createMarkovski() {
         const tokenizer = new natural.RegexpTokenizer({
@@ -153,5 +107,65 @@ export default class QuoteCommand extends CommandModule {
                 .map(w => emojiRegex().test(w) ? w : tokenizer.tokenize(w))
                 .reduce((arr, val) => Array.isArray(val) ? arr.concat(val) : (arr.push(val), arr), []))
             .endWhen(this.maxMarkovSentenceWordCount);
+    }
+
+    /**
+     * @param threadId
+     * @param targetId
+     * @return {Promise.<Array.<*>>} promise of array of message objects
+     * @private
+     */
+    getMessages(threadId, targetId) {
+        const filterList = [];
+        if (targetId !== -1) {
+            filterList.push({ senderID: "fbid:" + targetId });
+        } else { // all
+            filterList.push({ senderID: { $ne: "fbid:" + this.api.getCurrentUserId() } }); // skip messages by the bot
+        }
+
+        filterList.push(
+            { attachments: { $size: 0 } },
+            { body: { $exists: true } },
+            { body: { $ne: "" } },
+            { body: new RegExp("^(?!" + this.escape + ").+$") } // skip messages that start with command symbol
+        );
+
+        return this.db
+            .collection(`thread-${threadId}`)
+            .find({ "$and": filterList })
+            .toArray();
+    }
+
+    /**
+     * @param {Array.<string>} messages
+     * @return {string}
+     * @private
+     */
+    buildMarkovSentence(messages) {
+        const markovski = this.createMarkovski();
+        messages.forEach(m => markovski.train(m));
+        return markovski.generate();
+    }
+
+    /**
+     * @param targetId
+     * @return {Promise.<string>}
+     * @private
+     */
+    getParticipantName(targetId) {
+        return this.api
+            .getUserInfo(targetId)
+            .then(info => {
+                const bro = new Bro(info);
+                const prop = targetId + ".name";
+
+                if (!bro.doYouEven(prop)) {
+                    console.error("targetId", targetId);
+                    console.error("userInfo", info);
+                    throw new Error("Could not get name");
+                }
+
+                return bro.iCanHaz(prop);
+            });
     }
 }
