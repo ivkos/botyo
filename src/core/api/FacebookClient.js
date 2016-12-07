@@ -1,8 +1,8 @@
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
-import Configuration from "./Configuration";
+import Configuration from "../config/Configuration";
 import * as fs from "fs";
 import Promise from "bluebird";
-import AsyncResolvable from "./AsyncResolvable";
+import AsyncResolvable from "../util/AsyncResolvable";
 import ChatApi from "./ChatApi";
 
 const login = require("facebook-chat-api");

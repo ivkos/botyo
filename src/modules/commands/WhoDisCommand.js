@@ -1,7 +1,7 @@
 import CommandModule from "../CommandModule";
-import ChatApi from "../../util/ChatApi";
+import ChatApi from "../../core/api/ChatApi";
 import { dependencies as Inject } from "needlepoint";
-import Configuration from "../../util/Configuration";
+import Configuration from "../../core/config/Configuration";
 import Promise from "bluebird";
 import googl from "goo.gl";
 

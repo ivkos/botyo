@@ -1,7 +1,7 @@
 import { dependencies as Inject } from "needlepoint";
 import ScheduledTask from "../ScheduledTask";
-import Threads from "../../util/Threads";
-import ChatApi from "../../util/ChatApi";
+import Threads from "../../core/config/Threads";
+import ChatApi from "../../core/api/ChatApi";
 import Promise from "bluebird";
 
 @Inject(ChatApi, Threads)

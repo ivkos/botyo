@@ -1,7 +1,7 @@
 import { dependencies as Inject, singleton as Singleton, container as ApplicationIocContainer } from "needlepoint";
-import ScheduledTask from "../modules/ScheduledTask";
+import ScheduledTask from "../../modules/ScheduledTask";
 import glob from "glob";
-import Configuration from "./Configuration";
+import Configuration from "../config/Configuration";
 
 @Singleton
 @Inject(Configuration)
@@ -11,7 +11,7 @@ export default class TaskScheduler {
 
         this.taskInstanceToIntervalMap = new Map();
 
-        glob.sync("../modules/scheduled-tasks/**/*.js", { cwd: __dirname })
+        glob.sync("../../modules/scheduled-tasks/**/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
             .filter(clazz => clazz.prototype instanceof ScheduledTask)
             .map(clazz => {

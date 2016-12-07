@@ -1,8 +1,8 @@
 import { dependencies as Inject } from "needlepoint";
 import CommandModule from "../CommandModule";
-import ChatApi from "../../util/ChatApi";
-import Configuration from "../../util/Configuration";
-import Threads from "../../util/Threads";
+import ChatApi from "../../core/api/ChatApi";
+import Configuration from "../../core/config/Configuration";
+import Threads from "../../core/config/Threads";
 import Markovski from "markovski";
 import Bro from "brototype";
 import Db from "mongodb";

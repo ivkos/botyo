@@ -1,11 +1,11 @@
 import "source-map-support/register";
 import { container as ApplicationIocContainer } from "needlepoint";
-import Configuration from "./util/Configuration";
-import FacebookClient from "./util/FacebookClient";
-import Application from "./util/Application";
-import MongoConnector from "./util/MongoConnector";
+import Configuration from "./core/config/Configuration";
+import FacebookClient from "./core/api/FacebookClient";
+import Application from "./core/Application";
+import MongoConnector from "./core/db/MongoConnector";
 import Promise from "bluebird";
-import AsyncResolvable from "./util/AsyncResolvable";
+import AsyncResolvable from "./core/util/AsyncResolvable";
 
 ApplicationIocContainer.registerInstance(
     Configuration,

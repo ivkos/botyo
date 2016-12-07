@@ -2,9 +2,9 @@ import { singleton as Singleton } from "needlepoint";
 import * as YAML from "yamljs";
 import * as fs from "fs";
 import Bro from "brototype";
-import CommandModule from "../modules/CommandModule";
-import FilterModule from "../modules/FilterModule";
-import ScheduledTask from "../modules/ScheduledTask";
+import CommandModule from "../../modules/CommandModule";
+import FilterModule from "../../modules/FilterModule";
+import ScheduledTask from "../../modules/ScheduledTask";
 
 @Singleton
 export default class Configuration {

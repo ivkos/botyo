@@ -1,9 +1,9 @@
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import Db from "mongodb";
 import ScheduledTask from "../ScheduledTask";
-import Configuration from "../../util/Configuration";
-import ChatApi from "../../util/ChatApi";
-import Threads from "../../util/Threads";
+import Configuration from "../../core/config/Configuration";
+import ChatApi from "../../core/api/ChatApi";
+import Threads from "../../core/config/Threads";
 import Promise from "bluebird";
 import until from "async/until";
 

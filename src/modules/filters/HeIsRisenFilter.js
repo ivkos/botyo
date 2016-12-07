@@ -1,7 +1,7 @@
 import FilterModule from "../FilterModule";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
-import ChatApi from "../../util/ChatApi";
-import Configuration from "../../util/Configuration";
+import ChatApi from "../../core/api/ChatApi";
+import Configuration from "../../core/config/Configuration";
 import moment from "moment";
 import Bro from "brototype";
 

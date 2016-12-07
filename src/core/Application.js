@@ -1,11 +1,11 @@
 import { dependencies as Inject } from "needlepoint";
 import Promise from "bluebird";
-import ChatApi from "./ChatApi";
-import Configuration from "./Configuration";
-import TerminationHandler from "./TerminationHandler";
-import TaskScheduler from "./TaskScheduler";
+import ChatApi from "./api/ChatApi";
+import Configuration from "./config/Configuration";
+import TerminationHandler from "./util/TerminationHandler";
+import TaskScheduler from "./discovery/TaskScheduler";
 import fs from "fs";
-import FilterChain from "./FilterChain";
+import FilterChain from "./discovery/FilterChain";
 
 @Inject(
     Configuration,

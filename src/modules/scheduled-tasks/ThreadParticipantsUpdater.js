@@ -1,7 +1,7 @@
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import ScheduledTask from "../ScheduledTask";
-import Threads from "../../util/Threads";
-import ChatApi from "../../util/ChatApi";
+import Threads from "../../core/config/Threads";
+import ChatApi from "../../core/api/ChatApi";
 import Promise from "bluebird";
 
 @Singleton

@@ -1,5 +1,5 @@
 import CommandModule from "../CommandModule";
-import ChatApi from "../../util/ChatApi";
+import ChatApi from "../../core/api/ChatApi";
 import { dependencies as Inject } from "needlepoint";
 
 @Inject(ChatApi)

@@ -1,7 +1,7 @@
 import FilterModule from "../FilterModule";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import Promise from "bluebird";
-import Threads from "../../util/Threads";
+import Threads from "../../core/config/Threads";
 
 @Singleton
 @Inject(Threads)

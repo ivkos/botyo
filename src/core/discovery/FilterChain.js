@@ -1,6 +1,6 @@
 import { dependencies as Inject, container as ApplicationIocContainer } from "needlepoint";
-import Configuration from "./Configuration";
-import FilterModule from "../modules/FilterModule";
+import Configuration from "../config/Configuration";
+import FilterModule from "../../modules/FilterModule";
 import glob from "glob";
 import Promise from "bluebird";
 
@@ -20,7 +20,7 @@ export default class FilterChain {
          */
 
         const filterList = config.get("filter-chain");
-        const instances = glob.sync("../modules/filters/**/*.js", { cwd: __dirname })
+        const instances = glob.sync("../../modules/filters/**/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
             .filter(clazz => clazz.prototype instanceof FilterModule)
             .filter(clazz => {

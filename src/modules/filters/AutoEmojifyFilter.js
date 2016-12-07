@@ -1,6 +1,6 @@
 import FilterModule from "../FilterModule";
 import { dependencies as Inject, singleton as Singleton } from "needlepoint";
-import ChatApi from "../../util/ChatApi";
+import ChatApi from "../../core/api/ChatApi";
 import Emojify from "../../util/Emojify";
 
 const emojifiablePattern = /\b((?:[A-Z]\s){2,}[A-Z])\b/g;

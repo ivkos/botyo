@@ -1,7 +1,7 @@
 import { dependencies as Inject, singleton as Singleton, container as ApplicationIocContainer } from "needlepoint";
 import FilterModule from "../FilterModule";
-import Configuration from "../../util/Configuration";
-import ChatApi from "../../util/ChatApi";
+import Configuration from "../../core/config/Configuration";
+import ChatApi from "../../core/api/ChatApi";
 import glob from "glob";
 import CommandModule from "../CommandModule";
 
