@@ -36,84 +36,87 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
     downloadMessagesByThreadId(threadId) {
         const dbCollection = this.db.collection(`thread-${threadId}`);
 
-        //region promises
-        //region messageID index
+        return Promise
+            .all([
+                ThreadHistoryDownloader.createUniqueIndexIfNotExists(dbCollection),
+                dbCollection.count(),
+                this.api.getThreadInfo(threadId).then(info => info.messageCount)
+            ])
+            .then(([_, dbCount, fbCount]) => ThreadHistoryDownloader.handleMessageCount(dbCount, fbCount, threadId))
+            .then(messageCount => this.batchDownloadMessages(messageCount, threadId))
+            .then(messages => dbCollection.insertMany(messages, {
+                ordered: false // throw everything at the db and see what persists, i.e. don't stop on duplicate keys
+            }))
+            .catch(ThreadHistoryDownloadCancelledError, err => console.warn(err.message))
+            .catch(err => ThreadHistoryDownloader.handleDuplicateKeysError(err, threadId));
+    }
+
+    batchDownloadMessages(messageCount, threadId) {
+        const msgsPerRequest = Math.min(messageCount, 500);
+
+        let i = 0;
+        let lastTimestamp = +Date.now();
+        let downloadedMessages = [];
+
+        return new Promise((resolve, reject) => {
+            until(
+                () => (i * msgsPerRequest) >= messageCount,
+                done => {
+                    this.api.getThreadHistory(threadId, 0, msgsPerRequest, lastTimestamp).then(messages => {
+                        downloadedMessages = messages.concat(downloadedMessages);
+                        lastTimestamp = parseInt(messages[0].timestamp) - 1;
+                        i++;
+
+                        console.log(`Thread ${threadId}: Downloaded total ${downloadedMessages.length}/${messageCount} messages (got ${messages.length})`);
+
+                        done();
+                    }).catch(err => done(err));
+                },
+                err => {
+                    if (err) return reject(err);
+
+                    return resolve(downloadedMessages);
+                });
+        });
+    }
+
+    static handleMessageCount(dbCount, fbCount, threadId) {
+        console.log(`Thread ${threadId}: There are ${dbCount} messages in cache, and ${fbCount} reported by Facebook`);
+
+        if (dbCount == fbCount) {
+            return Promise.reject(new ThreadHistoryDownloadCancelledError(
+                `Thread ${threadId}: Message cache is up-to-date`
+            ));
+        }
+
+        if (dbCount > fbCount) {
+            console.warn(`There are more messages in the cache (${dbCount}) than Facebook reports (${fbCount}). ` +
+                `Will download the whole chat history.`);
+            return Promise.resolve(fbCount);
+        }
+
+        const diff = fbCount - dbCount;
+        console.log(`Thread ${threadId}: Message cache is ${diff} messages behind`);
+
+        return Promise.resolve(diff);
+    }
+
+    static createUniqueIndexIfNotExists(dbCollection) {
         const msgIdIndexName = "messageID";
         const uniqueMsgIdIndex = {};
         uniqueMsgIdIndex[msgIdIndexName] = 1;
 
-        const createIndexPromise = dbCollection.indexExists(msgIdIndexName)
+        return dbCollection.indexExists(msgIdIndexName)
             .then(() => Promise.resolve())
-            .catch((err) => dbCollection.createIndex(uniqueMsgIdIndex, { unique: true }));
-        //endregion
+            .catch(err => dbCollection.createIndex(uniqueMsgIdIndex, { unique: true }));
+    }
 
-        const dbMsgCountPromise = dbCollection.count();
-        const fbMsgCountPromise = this.api.getThreadInfo(threadId).then(info => info.messageCount);
-        //endregion
+    static handleDuplicateKeysError(err, threadId) {
+        if (err.code === 11000) {
+            return console.warn(`Thread ${threadId}: There were one or more duplicate messages`);
+        }
 
-        return Promise
-            .all([createIndexPromise, dbMsgCountPromise, fbMsgCountPromise])
-            .spread((createIndex, dbCount, fbCount) => {
-                console.log(`Thread ${threadId}: There are ${dbCount} messages in cache, and ${fbCount} reported by Facebook`);
-
-                if (dbCount == fbCount) {
-                    return Promise.reject(new ThreadHistoryDownloadCancelledError(
-                        `Thread ${threadId}: Message cache is up-to-date`
-                    ));
-                }
-
-                if (dbCount > fbCount) {
-                    console.warn(`There are more messages in the cache (${dbCount}) than Facebook reports (${fbCount}). ` +
-                        `Will download the whole chat history.`);
-                    return Promise.resolve(fbCount);
-                }
-
-                const diff = fbCount - dbCount;
-                console.log(`Thread ${threadId}: Message cache is ${diff} messages behind`);
-
-                return Promise.resolve(diff);
-            })
-            .then(msgCountToDownload => {
-                const msgsPerRequest = Math.min(msgCountToDownload, 500);
-
-                let i = 0;
-                let lastTimestamp = +Date.now();
-                let downloadedMessages = [];
-
-                return new Promise((resolve, reject) => {
-                    until(() => (i * msgsPerRequest) >= msgCountToDownload, (done) => {
-                        this.api.getThreadHistory(threadId, 0, msgsPerRequest, lastTimestamp)
-                            .then(messages => {
-                                downloadedMessages = messages.concat(downloadedMessages);
-                                lastTimestamp = parseInt(messages[0].timestamp) - 1;
-                                i++;
-
-                                console.log(`Thread ${threadId}: Downloaded total ${downloadedMessages.length}/${msgCountToDownload} messages (got ${messages.length})`);
-
-                                done();
-                            })
-                            .catch(err => done(err));
-                    }, (err) => {
-                        if (err) return reject(err);
-
-                        return resolve(downloadedMessages);
-                    });
-                });
-            })
-            .then(downloadedMessages => dbCollection.insertMany(downloadedMessages, {
-                ordered: false // throw everything at the db and see what persists, i.e. don't stop on duplicate keys
-            }))
-            .catch(ThreadHistoryDownloadCancelledError, err => {
-                return console.warn(err.message);
-            })
-            .catch(err => {
-                // ignore duplicate keys error
-                if (err.code === 11000) {
-                    return console.warn(`Thread ${threadId}: There were one or more duplicate messages`);
-                }
-
-                throw err;
-            });
+        throw err;
     }
 }
 
