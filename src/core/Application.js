@@ -1,4 +1,4 @@
-import { dependencies as Inject } from "needlepoint";
+import { dependencies as Inject, container as ApplicationIocContainer } from "needlepoint";
 import Promise from "bluebird";
 import ChatApi from "./api/ChatApi";
 import Configuration from "./config/Configuration";
@@ -6,6 +6,9 @@ import TerminationHandler from "./util/TerminationHandler";
 import TaskScheduler from "./discovery/TaskScheduler";
 import fs from "fs";
 import FilterChain from "./discovery/FilterChain";
+import AsyncResolver from "./discovery/AsyncResolver";
+import MongoConnector from "./db/MongoConnector";
+import FacebookClient from "./api/FacebookClient";
 
 @Inject(
     Configuration,
@@ -44,5 +47,16 @@ export default class Application {
 
             return this.filterChain.pass(msg);
         });
+    }
+
+    static initialize() {
+        return AsyncResolver
+            .resolve(
+                MongoConnector,
+                FacebookClient
+            )
+            .then(() => ApplicationIocContainer.resolve(Application))
+            .then(app => app.start())
+            .catch(err => console.error(err));
     }
 }

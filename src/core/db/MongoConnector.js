@@ -3,7 +3,7 @@ import Configuration from "../config/Configuration";
 import MongoClient from "mongodb";
 import Db from "mongodb";
 import Promise from "bluebird";
-import AsyncResolvable from "../util/AsyncResolvable";
+import AsyncResolvable from "../discovery/AsyncResolvable";
 
 @Singleton
 @Inject(Configuration)
