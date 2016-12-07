@@ -50,7 +50,7 @@ mongo:
   url: "mongodb://10.0.15.143:27017/botyo"
 ```
 
-Set the state file to one in a directory you can write to:
+Set the state file to one in a directory you can write to, for example:
 ```yaml
 app:
   stateFile: /home/botyo/data/app/appstate.json
