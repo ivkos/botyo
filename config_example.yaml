@@ -72,6 +72,11 @@ modules:
     StatsCommand:
       enable: true
 
+    # Translates text
+    TranslateCommand:
+      enable: true
+      defaultToLanguage: en             # default language to translate into if none is specified
+
     # Runs a reverse image search on the last picture in the chat
     WhoDisCommand:
       enable: false

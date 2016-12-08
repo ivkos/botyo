@@ -105,6 +105,11 @@ In order for your modules to get auto-discovered and work correctly, they must e
 	* `#showme 3 cats` - Shows you three pictures of cats.
 	* `#showme "3 cats"` - Shows you a picture of three cats.
 * `#stats` - Returns some stats for the chat, including but not limited to number of messages and number of participants.
+* `#translate [([from:]to)] <text>` - Translates text using Google Translate. Examples:
+    * `#translate (en:fr) Hello!` - Translates "Hello!" from English to French
+    * `#translate (english:french) Hello!` - Ditto. Full language names can also be used, case insensitive
+    * `#translate (French) Hello!` - Automatically detects the language and translates to French
+    * `#translate Bonjour!` - Automatically detects the language and translates to the default language set in `config.yaml`
 * `#whodis` - Runs a reverse image search on the last picture sent to the chat, and gives you links to the results. This command is disabled by default because it requires manual configuration of API keys needed to use the Google URL Shortener. See `config.yaml` for instructions how to configure.
 
 ### Filters
