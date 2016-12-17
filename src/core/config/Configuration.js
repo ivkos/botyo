@@ -41,10 +41,10 @@ export default class Configuration {
     }
 
     /**
-     * Returns true if the property is defined in the configuration file
+     * Returns true if the property is defined in the configuration file, otherwise false
      *
-     * @param property
-     * @return {*}
+     * @param {string} property
+     * @return {boolean} true if the property is defined in the configuration file, otherwise false
      */
     has(property) {
         return this.bro.doYouEven(property);
@@ -54,6 +54,7 @@ export default class Configuration {
      * Returns true if the module is enabled
      *
      * @param {CommandModule|FilterModule|ScheduledTask} moduleClassOrInstance
+     * @return {boolean} true if the module is enabled, otherwise false
      */
     isModuleEnabled(moduleClassOrInstance) {
         const configPathCommand = `modules` +
@@ -94,9 +95,10 @@ export default class Configuration {
     /**
      * Returns the property name for a specific module type
      *
-     * @param moduleType
+     * @param {CommandModule|FilterModule|ScheduledTask} moduleType
+     * @return {string}
+     * @throws {Error} if the moduleType is unknown
      * @private
-     * @return {*}
      */
     static getConfigModulePathByModuleType(moduleType) {
         if (moduleType instanceof CommandModule) {
