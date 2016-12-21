@@ -10,6 +10,7 @@ export default class TaskScheduler {
         this.config = config;
 
         this.taskInstanceToIntervalMap = new Map();
+        this.taskInstanceToPromiseMap = new Map();
 
         glob.sync("../../modules/scheduled-tasks/**/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
@@ -36,10 +37,10 @@ export default class TaskScheduler {
             const taskInterval = this.config.getModuleConfig(task, "interval");
 
             if (taskShouldExecuteOnStart) {
-                setImmediate(() => TaskScheduler.executeTask(task));
+                setImmediate(() => this.executeTask(task));
             }
 
-            const newIntervalObj = setInterval(() => TaskScheduler.executeTask(task), taskInterval);
+            const newIntervalObj = setInterval(() => this.executeTask(task), taskInterval);
 
             theMap.set(task, newIntervalObj);
         });
@@ -47,12 +48,16 @@ export default class TaskScheduler {
 
     stop() {
         this.taskInstanceToIntervalMap.forEach((intervalObj, task) => clearInterval(intervalObj));
+
+        this.taskInstanceToPromiseMap.forEach(promise => (promise.cancel || (() => {}))());
+        this.taskInstanceToPromiseMap.clear();
     }
 
     /**
      * @param {ScheduledTask} taskInstance
+     * @private
      */
-    static executeTask(taskInstance) {
+    executeTask(taskInstance) {
         const taskName = taskInstance.constructor.name;
 
         if (taskInstance.isRunning()) {
@@ -62,11 +67,15 @@ export default class TaskScheduler {
         console.log(`Executing task ${taskName}...`);
 
         taskInstance._isRunning = true;
-        taskInstance.execute()
+        const promise = taskInstance.execute();
+        this.taskInstanceToPromiseMap.set(taskInstance, promise);
+
+        return promise
+            .then(() => console.log(`Task ${taskName} finished successfully`))
             .catch(err => console.error(`Execution of task ${taskName} failed`, err))
             .finally(() => {
-                console.log(`Task ${taskName} finished`);
                 taskInstance._isRunning = false;
+                this.taskInstanceToPromiseMap.delete(taskInstance);
             });
     }
 }

@@ -1,18 +1,23 @@
-import { dependencies as Inject } from "needlepoint";
+import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import FacebookClient from "../api/FacebookClient";
 import MongoConnector from "../db/MongoConnector";
 import Promise from "bluebird";
 import npid from "npid";
+import TaskScheduler from "../discovery/TaskScheduler";
 
-@Inject(FacebookClient, MongoConnector)
+@Singleton
+@Inject(FacebookClient, MongoConnector, TaskScheduler)
 export default class TerminationHandler {
     /**
      * @param {FacebookClient} facebookClient
      * @param {MongoConnector} mongoConnector
+     * @param {TaskScheduler} taskScheduler
+     * @constructor
      */
-    constructor(facebookClient, mongoConnector) {
+    constructor(facebookClient, mongoConnector, taskScheduler) {
         this.facebookClient = facebookClient;
         this.mongoConnector = mongoConnector;
+        this.taskScheduler = taskScheduler;
     }
 
     register() {
@@ -35,7 +40,8 @@ export default class TerminationHandler {
 
         return Promise.all([
             this.terminateFacebookClient(),
-            this.terminateMongoConnector()
+            this.terminateMongoConnector(),
+            this.terminateTaskScheduler()
         ]).finally(() => {
             console.log("Goodbye!");
             process.exit();
@@ -52,5 +58,9 @@ export default class TerminationHandler {
 
     terminateMongoConnector() {
         return this.mongoConnector.disconnect();
+    }
+
+    terminateTaskScheduler() {
+        return this.taskScheduler.stop();
     }
 }
