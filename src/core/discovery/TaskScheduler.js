@@ -53,17 +53,19 @@ export default class TaskScheduler {
      * @param {ScheduledTask} taskInstance
      */
     static executeTask(taskInstance) {
+        const taskName = taskInstance.constructor.name;
+
         if (taskInstance.isRunning()) {
-            return console.warn(`Execution of task ${taskInstance.constructor.name} cancelled because it is currently running`);
+            return console.warn(`Execution of task ${taskName} cancelled because it is currently running`);
         }
 
-        console.log(`Executing task ${taskInstance.constructor.name}...`);
+        console.log(`Executing task ${taskName}...`);
 
         taskInstance._isRunning = true;
         taskInstance.execute()
-            .catch(err => console.error(`Execution of task ${taskInstance.constructor.name} failed`, err))
+            .catch(err => console.error(`Execution of task ${taskName} failed`, err))
             .finally(() => {
-                console.log(`Task ${taskInstance.constructor.name} finished`);
+                console.log(`Task ${taskName} finished`);
                 taskInstance._isRunning = false;
             });
     }
