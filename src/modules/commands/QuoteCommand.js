@@ -23,6 +23,12 @@ export default class QuoteCommand extends CommandModule {
         this.maxMarkovSentenceWordCount = config.getModuleConfig(this, "maxMarkovSentenceWordCount");
         this.markovModelOrder = config.getModuleConfig(this, "markovModelOrder");
         this.markovBuildVom = config.getModuleConfig(this, "markovBuildVom");
+
+        this.censorship = config.getModuleConfig(this, "censorship");
+
+        if (this.censorship) {
+            this.censorshipRegex = QuoteCommand.parseRegex(config.getModuleConfig(this, "censorshipRegex"));
+        }
     }
 
     getCommand() {
@@ -145,7 +151,14 @@ export default class QuoteCommand extends CommandModule {
     buildMarkovSentence(messages) {
         const markovski = this.createMarkovski();
         messages.forEach(m => markovski.train(m));
-        return markovski.generate();
+
+        let sentence;
+        do {
+            sentence = markovski.generate();
+        }
+        while (this.censorship && this.censorshipRegex.test(sentence));
+
+        return sentence;
     }
 
     /**
@@ -168,5 +181,15 @@ export default class QuoteCommand extends CommandModule {
 
                 return bro.iCanHaz(prop);
             });
+    }
+
+    /**
+     * @param str
+     * @returns {RegExp}
+     * @private
+     */
+    static parseRegex(str) {
+        const matches = str.match(new RegExp('^/(.*?)/([gimuy]*)$'));
+        return new RegExp(matches[1], matches[2]);
     }
 }

@@ -60,6 +60,8 @@ modules:
       maxMarkovSentenceWordCount: 20   # limit for the generated sentence's word count
       markovModelOrder: 2              # order of the Markov model
       markovBuildVom: false            # whether to build a variable-order Markov model
+      censorship: false                # whether to censor (i.e. not send) sentences matching the following regex, and generate new ones instead
+      censorshipRegex: "/badword|worseword/gi"      # JavaScript regex
 
     # Returns the first few images found in Google Images matching the query
     ShowMeCommand:
