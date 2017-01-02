@@ -2,6 +2,7 @@ import { dependencies as Inject, singleton as Singleton, container as Applicatio
 import ScheduledTask from "../../modules/ScheduledTask";
 import glob from "glob";
 import Configuration from "../config/Configuration";
+import UnexpectedTokenHandler from "../api/UnexpectedTokenHandler";
 
 @Singleton
 @Inject(Configuration)
@@ -72,7 +73,10 @@ export default class TaskScheduler {
 
         return promise
             .then(() => console.log(`Task ${taskName} finished successfully`))
-            .catch(err => console.error(`Execution of task ${taskName} failed`, err))
+            .catch(err => {
+                console.error(`Execution of task ${taskName} failed`, err);
+                return UnexpectedTokenHandler.handle(err);
+            })
             .finally(() => {
                 taskInstance._isRunning = false;
                 this.taskInstanceToPromiseMap.delete(taskInstance);

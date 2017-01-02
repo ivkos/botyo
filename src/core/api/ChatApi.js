@@ -4,14 +4,21 @@ import { singleton as Singleton } from "needlepoint";
 @Singleton
 export default class ChatApi {
     /**
-     * @param {*} api the api object as defined in the facebook-chat-api module
+     * @param {*} rawApi the api object as defined in the facebook-chat-api module
      */
-    constructor(api) {
-        this.api = api;
+    constructor(rawApi) {
+        /**
+         * @private
+         */
+        this._rawApi = rawApi;
+    }
 
-        this.api.setOptions({
-            logLevel: "warn"
-        });
+    /**
+     * @param {ChatApi} chatApi
+     * @private
+     */
+    cloneProperties(chatApi) {
+        this._rawApi = chatApi._rawApi;
     }
 
     /**
@@ -27,7 +34,7 @@ export default class ChatApi {
      * @return {*}
      */
     listen(callback) {
-        return this.api.listen(callback);
+        return this._rawApi.listen(callback);
     }
 
     /**
@@ -38,7 +45,7 @@ export default class ChatApi {
      * @return {Promise.<Object>} promise with message object representing the sent message
      */
     sendMessage(message, threadId) {
-        return Promise.promisify(this.api.sendMessage)(message, threadId);
+        return Promise.promisify(this._rawApi.sendMessage)(message, threadId);
     }
 
     /**
@@ -49,7 +56,7 @@ export default class ChatApi {
      * @return {Promise} empty promise
      */
     changeThreadColor(color, threadId) {
-        return Promise.promisify(this.api.changeThreadColor)(color, threadId);
+        return Promise.promisify(this._rawApi.changeThreadColor)(color, threadId);
     }
 
     /**
@@ -59,7 +66,7 @@ export default class ChatApi {
      * @return {Promise.<Object>} promise with info object
      */
     getThreadInfo(threadId) {
-        return Promise.promisify(this.api.getThreadInfo)(threadId);
+        return Promise.promisify(this._rawApi.getThreadInfo)(threadId);
     }
 
     /**
@@ -73,7 +80,7 @@ export default class ChatApi {
      * @return {Promise.<Object[]>} promise with array of messages
      */
     getThreadHistory(threadId, start, end, timestamp) {
-        return Promise.promisify(this.api.getThreadHistory)(threadId, start, end, timestamp);
+        return Promise.promisify(this._rawApi.getThreadHistory)(threadId, start, end, timestamp);
     }
 
     /**
@@ -90,7 +97,7 @@ export default class ChatApi {
      */
     sendTypingIndicator(threadId) {
         return new Promise((resolve, reject) => {
-            const endFn = this.api.sendTypingIndicator(threadId, (err) => {
+            const endFn = this._rawApi.sendTypingIndicator(threadId, (err) => {
                 if (err) return reject(err);
 
                 return resolve(this._endTypingIndicator(endFn));
@@ -119,7 +126,7 @@ export default class ChatApi {
      * @return {Promise} empty promise
      */
     markAsRead(threadId) {
-        return Promise.promisify(this.api.markAsRead)(threadId);
+        return Promise.promisify(this._rawApi.markAsRead)(threadId);
     }
 
     /**
@@ -129,7 +136,7 @@ export default class ChatApi {
      * @return {Promise.<Object>} promise with info object
      */
     getUserInfo(ids) {
-        return Promise.promisify(this.api.getUserInfo)(ids);
+        return Promise.promisify(this._rawApi.getUserInfo)(ids);
     }
 
     /**
@@ -138,7 +145,7 @@ export default class ChatApi {
      * @return {number} the user ID
      */
     getCurrentUserId() {
-        return this.api.getCurrentUserID();
+        return this._rawApi.getCurrentUserID();
     }
 
     /**
@@ -149,6 +156,6 @@ export default class ChatApi {
      * @return {Promise} empty promise
      */
     handleMessageRequest(threadId, isAccepted) {
-        return Promise.promisify(this.api.handleMessageRequest)(threadId, isAccepted);
+        return Promise.promisify(this._rawApi.handleMessageRequest)(threadId, isAccepted);
     }
 }

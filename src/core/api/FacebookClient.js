@@ -48,6 +48,10 @@ export default class FacebookClient extends AsyncResolvable {
                     }
                 }
 
+                api.setOptions({
+                    logLevel: "warn"
+                });
+
                 this.api = api;
 
                 fs.writeFileSync(this.appStateFilePath, JSON.stringify(api.getAppState()));
@@ -62,6 +66,10 @@ export default class FacebookClient extends AsyncResolvable {
      */
     logout() {
         return new Promise((resolve, reject) => {
+            if (this.isAppStateAvailable()) {
+                fs.unlinkSync(this.appStateFilePath);
+            }
+
             this.api.logout(err => {
                 if (err) return reject(err);
 

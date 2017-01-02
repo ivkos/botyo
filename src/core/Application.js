@@ -9,6 +9,7 @@ import FilterChain from "./discovery/FilterChain";
 import AsyncResolver from "./discovery/AsyncResolver";
 import MongoConnector from "./db/MongoConnector";
 import FacebookClient from "./api/FacebookClient";
+import UnexpectedTokenHandler from "./api/UnexpectedTokenHandler";
 
 @Inject(
     Configuration,
@@ -57,6 +58,9 @@ export default class Application {
             )
             .then(() => ApplicationIocContainer.resolve(Application))
             .then(app => app.start())
-            .catch(err => console.error(err));
+            .catch(err => {
+                console.error(err);
+                return UnexpectedTokenHandler.handle(err);
+            });
     }
 }
