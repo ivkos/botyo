@@ -38,7 +38,7 @@
     "brototype": "^0.0.6",
     "emoji-emoticon-to-unicode": "^0.2.2",
     "emoji-regex": "^6.0.0",
-    "facebook-chat-api": "^1.2.0",
+    "facebook-chat-api": "Schmavery/facebook-chat-api#41518f8f373805c5ec887452661ad32bb036923c",
     "glob": "^7.1.1",
     "goo.gl": "^0.1.4",
     "google-images": "^2.0.0",
