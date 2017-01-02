@@ -59,6 +59,7 @@ modules:
       enable: true
       maxMarkovSentenceWordCount: 20   # limit for the generated sentence's word count
       markovModelOrder: 2              # order of the Markov model
+      markovBuildVom: false            # whether to build a variable-order Markov model
 
     # Returns the first few images found in Google Images matching the query
     ShowMeCommand:

@@ -22,6 +22,7 @@ export default class QuoteCommand extends CommandModule {
         this.escape = config.get("app.commandEscape");
         this.maxMarkovSentenceWordCount = config.getModuleConfig(this, "maxMarkovSentenceWordCount");
         this.markovModelOrder = config.getModuleConfig(this, "markovModelOrder");
+        this.markovBuildVom = config.getModuleConfig(this, "markovBuildVom");
     }
 
     getCommand() {
@@ -98,7 +99,7 @@ export default class QuoteCommand extends CommandModule {
             pattern: /[^A-Za-zА-Яа-я0-9_\-*@%$]+/
         });
 
-        return new Markovski(this.markovModelOrder)
+        return new Markovski(this.markovModelOrder, this.markovBuildVom)
             .sentenceToWordsSplitter(sentence => sentence
                 .split(/\s/)
                 .map(w => w.trim())
