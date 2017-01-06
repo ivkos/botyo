@@ -48,6 +48,10 @@ modules:
     EmojifyCommand:
       enable: true
 
+    # Responds with a Kanye West quote
+    KanyeCommand:
+      enable: true
+
     # Makes the bot respond to pings
     PingCommand:
       enable: true
