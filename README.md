@@ -93,6 +93,7 @@ In order for your modules to get auto-discovered and work correctly, they must e
 ### Commands
 * `#help` - Responds with a list of all available commands.
 * `#ae <text>` - Returns the text aesthetically (un)pleasing, e.g. "hello" becomes "ｈｅｌｌｏ".
+* `#anotherone` - Responds with a DJ Khaled audio quote (courtesy of [theydontwantyouto.win](http://theydontwantyouto.win)).
 * `#color <hex string>` - Changes the chat color.
 * `#emojify <text>` - Returns the text emojified, i.e. every letter and number are replaced with emoji ones.
 * `#kanye` - Responds with a Kanye West quote (uses [yepi.io](https://yepi.io/))

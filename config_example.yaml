@@ -40,6 +40,10 @@ modules:
     AestheticCommand:
       enable: true
 
+    # Responds with a DJ Khaled audio quote
+    AnotherOneCommand:
+      enable: true
+
     # Changes the chat color
     ColorCommand:
       enable: true
