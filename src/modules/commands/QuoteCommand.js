@@ -6,9 +6,6 @@ import Threads from "../../core/config/Threads";
 import Markovski from "markovski";
 import Bro from "brototype";
 import Db from "mongodb";
-import natural from "natural";
-import emojiRegex from "emoji-regex";
-import emoticonToEmojiMap from "emoji-emoticon-to-unicode";
 
 @Inject(ChatApi, Configuration, Threads, Db)
 export default class QuoteCommand extends CommandModule {
@@ -101,18 +98,16 @@ export default class QuoteCommand extends CommandModule {
      * @private
      */
     createMarkovski() {
-        const tokenizer = new natural.RegexpTokenizer({
-            pattern: /[^A-Za-zА-Яа-я0-9_\-*@%$]+/
-        });
+        const singlePunctuation = new RegExp(/^[,.;:!?\(\)]$/);
 
         return new Markovski(this.markovModelOrder, this.markovBuildVom)
+            .lowerCaseModelKeys(true)
+            .wordNormalizer(word => word.replace(/[.,!?]+$/ig, ''))
             .sentenceToWordsSplitter(sentence => sentence
                 .split(/\s/)
                 .map(w => w.trim())
                 .filter(w => w.length > 0)
-                .map(w => emoticonToEmojiMap[w] ? String.fromCodePoint(parseInt(emoticonToEmojiMap[w], 16)) : w)
-                .map(w => emojiRegex().test(w) ? w : tokenizer.tokenize(w))
-                .reduce((arr, val) => Array.isArray(val) ? arr.concat(val) : (arr.push(val), arr), []))
+                .filter(w => !singlePunctuation.test(w)))
             .endWhen(this.maxMarkovSentenceWordCount);
     }
 
