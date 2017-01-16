@@ -52,6 +52,10 @@ export default class QuoteCommand extends CommandModule {
             return this.api.sendMessage("Literally who?", threadId);
         }
 
+        if (targetId === this.api.getCurrentUserId()) {
+            return this.api.sendMessage("\u{1F635}", threadId);
+        }
+
         const sentencePromise = this.getMessages(threadId, targetId)
             .then(history => history.map(m => m.body))
             .then(messages => this.buildMarkovSentence(messages));
