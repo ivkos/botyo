@@ -56,6 +56,10 @@ modules:
     KanyeCommand:
       enable: true
 
+    # Googles that for you
+    LmgtfyCommand:
+      enable: true
+
     # Makes the bot respond to pings
     PingCommand:
       enable: true

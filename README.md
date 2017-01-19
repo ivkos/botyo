@@ -97,6 +97,7 @@ In order for your modules to get auto-discovered and work correctly, they must e
 * `#color <hex string>` - Changes the chat color.
 * `#emojify <text>` - Returns the text emojified, i.e. every letter and number are replaced with emoji ones.
 * `#kanye` - Responds with a Kanye West quote (uses [yepi.io](https://yepi.io/))
+* `#lmgtfy <query>` - Googles that for you using [lmgtfy](https://lmgtfy.com/)
 * `#ping` - Makes the bot respond to the ping if it is online.
 * `#quote <person | me | all | *>` - Generates a faux quote using Markov chains based on messages in the chat.
 	* `#quote <person>` - Quotes a specific person identified by their name, chat nickname, custom alias (as defined in `config.yaml`), Facebook username, or a string that is close enough to those. This works by calculating the similarity of the string to the participants' identifiers, so for example `#quote abi` would quote Abigail.
