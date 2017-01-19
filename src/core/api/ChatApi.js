@@ -145,7 +145,7 @@ export default class ChatApi {
      * @return {number} the user ID
      */
     getCurrentUserId() {
-        return this._rawApi.getCurrentUserID();
+        return parseInt(this._rawApi.getCurrentUserID());
     }
 
     /**
