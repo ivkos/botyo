@@ -6,7 +6,6 @@ build/
 data/
 node_modules/
 
-app.pid
 config_example.yaml
 LICENSE
 README.md

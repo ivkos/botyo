@@ -2,7 +2,6 @@ import { dependencies as Inject, singleton as Singleton } from "needlepoint";
 import FacebookClient from "../api/FacebookClient";
 import MongoConnector from "../db/MongoConnector";
 import Promise from "bluebird";
-import npid from "npid";
 import TaskScheduler from "../discovery/TaskScheduler";
 
 @Singleton
@@ -26,13 +25,6 @@ export default class TerminationHandler {
         process.on('SIGTERM', () => this.terminate());
         process.on('SIGINT', () => this.terminate());
         process.on('SIGHUP', () => this.terminate());
-
-        try {
-            const pid = npid.create('app.pid');
-            pid.removeOnExit();
-        } catch (err) {
-            console.warn("Could not create pid file", err);
-        }
     }
 
     terminate() {

@@ -15,31 +15,31 @@ Botyo is written in Node.js, and runs in a multi-container Docker environment us
 **Botyo** can also be run without Docker on any Node.js-compatible platform, as long as it is configured correctly according to the instructions below.
 
 ## Download
-```sh
+```bash
 git clone https://github.com/ivkos/botyo.git
 ```
 
 ## Running inside Docker
 First, you need copy the provided example configuration file, and edit it using your favorite text editor:
-```sh
+```bash
 cp config_example.yaml config.yaml
 nano config.yaml
 ```
 
 Then run the bot:
-```sh
+```bash
 ./run.sh
 ```
 This will build all relevant Docker images, and then start the bot. It will run the app as a daemon in the background, so you can safely Ctrl-C out of the logs, and the bot will keep running.
 
 To stop the bot and its dependent Docker containers:
-```sh
+```bash
 ./stop.sh
 ```
 
 ## Running without Docker
 Copy the example configuration file into a new one, then edit it:
-```sh
+```bash
 cp config_example.yaml config.yaml
 nano config.yaml
 ```
@@ -59,12 +59,17 @@ app:
 Configure the rest of the options in the config file as per your liking.
 
 Install the dependencies:
-```sh
+```bash
 npm install
 ```
 
+Build:
+```bash
+npm run build
+```
+
 Then run Botyo:
-```sh
+```bash
 npm run start
 ```
 

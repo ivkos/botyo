@@ -2,11 +2,9 @@
   "name": "botyo",
   "version": "1.0.0",
   "description": "Botyo is a modular bot designed for group chat rooms on Facebook",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "prebuild": "rimraf build/",
     "build": "babel src --out-dir build/ --source-maps",
-    "prestart": "npm run build",
     "start": "node build/index.js"
   },
   "repository": {
@@ -46,10 +44,8 @@
     "moment": "^2.15.2",
     "mongodb": "^2.2.11",
     "needlepoint": "^1.0.5",
-    "npid": "^0.4.0",
     "parse": "^1.9.2",
     "request": "^2.75.0",
-    "rimraf": "^2.5.4",
     "string-similarity": "^1.1.0",
     "tmp": "0.0.29",
     "yamljs": "^0.2.8"
