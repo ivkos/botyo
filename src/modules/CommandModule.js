@@ -1,3 +1,5 @@
+import Promise from "bluebird";
+
 export default class CommandModule {
     /**
      * Returns the command this module acts on. This string should not include the escape sequence.

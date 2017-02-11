@@ -4,6 +4,7 @@ import ChatApi from "../../core/api/ChatApi";
 import Configuration from "../../core/config/Configuration";
 import moment from "moment";
 import Bro from "brototype";
+import Promise from "bluebird";
 
 @Singleton
 @Inject(ChatApi, Configuration)

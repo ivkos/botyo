@@ -3,6 +3,7 @@ import CommandModule from "../CommandModule";
 import ChatApi from "../../core/api/ChatApi";
 import Configuration from "../../core/config/Configuration";
 import translate from "google-translate-api";
+import Promise from "bluebird";
 
 @Inject(ChatApi, Configuration)
 export default class TranslateCommand extends CommandModule {

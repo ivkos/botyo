@@ -6,6 +6,7 @@ import Threads from "../../core/config/Threads";
 import Markovski from "markovski";
 import Bro from "brototype";
 import Db from "mongodb";
+import Promise from "bluebird";
 
 @Inject(ChatApi, Configuration, Threads, Db)
 export default class QuoteCommand extends CommandModule {
