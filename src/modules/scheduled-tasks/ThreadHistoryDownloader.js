@@ -63,21 +63,22 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
                     return this.api
                         .getThreadHistory(threadId, 0, msgsPerRequest, lastTimestamp)
                         .then(messages => {
+                            if (messages.length === 0) {
+                                i++;
+                                return Promise.resolve();
+                            }
+
                             downloadedMessageCount += messages.length;
                             lastTimestamp = parseInt(messages[0].timestamp) - 1;
                             i++;
 
-                            return this.upsertMany(dbCollection, messages);
-                        })
-                        .then(({ upsertedCount }) => {
-                            console.log(
+                            return this.upsertMany(dbCollection, messages).then(({ upsertedCount }) => console.log(
                                 `Thread ${threadId}: ` +
                                 `Downloaded total ${downloadedMessageCount}/${messageCount} messages ` +
                                 `(${upsertedCount} new)`
-                            );
-
-                            return done();
+                            ));
                         })
+                        .then(() => done())
                         .catch(err => done(err));
                 },
                 err => {
