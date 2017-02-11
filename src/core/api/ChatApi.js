@@ -11,6 +11,12 @@ export default class ChatApi {
          * @private
          */
         this._rawApi = rawApi;
+
+       /**
+        * @type {WeakMap}
+        * @private
+        */
+        this._apiFnToPromisifiedFnMap = new WeakMap();
     }
 
     /**
@@ -45,7 +51,7 @@ export default class ChatApi {
      * @return {Promise.<Object>} promise with message object representing the sent message
      */
     sendMessage(message, threadId) {
-        return Promise.promisify(this._rawApi.sendMessage)(message, threadId);
+        return this._promisifyAndCache(this._rawApi.sendMessage)(message, threadId);
     }
 
     /**
@@ -56,7 +62,7 @@ export default class ChatApi {
      * @return {Promise} empty promise
      */
     changeThreadColor(color, threadId) {
-        return Promise.promisify(this._rawApi.changeThreadColor)(color, threadId);
+        return this._promisifyAndCache(this._rawApi.changeThreadColor)(color, threadId);
     }
 
     /**
@@ -66,7 +72,7 @@ export default class ChatApi {
      * @return {Promise.<Object>} promise with info object
      */
     getThreadInfo(threadId) {
-        return Promise.promisify(this._rawApi.getThreadInfo)(threadId);
+        return this._promisifyAndCache(this._rawApi.getThreadInfo)(threadId);
     }
 
     /**
@@ -80,7 +86,7 @@ export default class ChatApi {
      * @return {Promise.<Object[]>} promise with array of messages
      */
     getThreadHistory(threadId, start, end, timestamp) {
-        return Promise.promisify(this._rawApi.getThreadHistory)(threadId, start, end, timestamp);
+        return this._promisifyAndCache(this._rawApi.getThreadHistory)(threadId, start, end, timestamp);
     }
 
     /**
@@ -126,7 +132,7 @@ export default class ChatApi {
      * @return {Promise} empty promise
      */
     markAsRead(threadId) {
-        return Promise.promisify(this._rawApi.markAsRead)(threadId);
+        return this._promisifyAndCache(this._rawApi.markAsRead)(threadId);
     }
 
     /**
@@ -136,7 +142,7 @@ export default class ChatApi {
      * @return {Promise.<Object>} promise with info object
      */
     getUserInfo(ids) {
-        return Promise.promisify(this._rawApi.getUserInfo)(ids);
+        return this._promisifyAndCache(this._rawApi.getUserInfo)(ids);
     }
 
     /**
@@ -156,6 +162,21 @@ export default class ChatApi {
      * @return {Promise} empty promise
      */
     handleMessageRequest(threadId, isAccepted) {
-        return Promise.promisify(this._rawApi.handleMessageRequest)(threadId, isAccepted);
+        return this._promisifyAndCache(this._rawApi.handleMessageRequest)(threadId, isAccepted);
     }
+
+   /**
+    * @param {function} fn
+    * @private
+    */
+   _promisifyAndCache(fn) {
+       let promisifiedFn = this._apiFnToPromisifiedFnMap.get(fn);
+
+       if (!promisifiedFn) {
+           promisifiedFn = Promise.promisify(fn);
+           this._apiFnToPromisifiedFnMap.set(fn, promisifiedFn);
+       }
+
+      return promisifiedFn;
+   }
 }
