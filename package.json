@@ -44,7 +44,6 @@
     "moment": "^2.15.2",
     "mongodb": "^2.2.11",
     "needlepoint": "^1.0.5",
-    "parse": "^1.9.2",
     "request": "^2.75.0",
     "string-similarity": "^1.1.0",
     "tmp": "0.0.29",
