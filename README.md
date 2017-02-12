@@ -100,7 +100,6 @@ In order for your modules to get auto-discovered and work correctly, they must e
 * `#ae <text>` - Returns the text aesthetically (un)pleasing, e.g. "hello" becomes "ｈｅｌｌｏ".
 * `#color <hex string>` - Changes the chat color.
 * `#emojify <text>` - Returns the text emojified, i.e. every letter and number are replaced with emoji ones.
-* `#kanye` - Responds with a Kanye West quote (uses [yepi.io](https://yepi.io/))
 * `#lmgtfy <query>` - Googles that for you using [lmgtfy](https://lmgtfy.com/)
 * `#ping` - Makes the bot respond to the ping if it is online.
 * `#quote <person | me | all | *>` - Generates a faux quote using Markov chains based on messages in the chat.
