@@ -80,7 +80,7 @@ export default class CommandExecutorFilter extends FilterModule {
     }
 
     getCommandNameOfMessage(msg) {
-        const escapedCommand = msg.body.split(" ")[0];
+        const escapedCommand = msg.body.split(/\s+/)[0];
 
         return escapedCommand.substring(escapedCommand.indexOf(this.escape) + this.escape.length);
     }
