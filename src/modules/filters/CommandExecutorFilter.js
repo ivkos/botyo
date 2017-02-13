@@ -86,7 +86,7 @@ export default class CommandExecutorFilter extends FilterModule {
     }
 
     getArgsString(msg) {
-        const escapedCommand = msg.body.split(" ")[0];
+        const escapedCommand = msg.body.split(/\s+/)[0];
 
         return msg.body.substring(msg.body.indexOf(escapedCommand) + escapedCommand.length).trim();
     }
