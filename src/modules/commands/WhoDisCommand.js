@@ -51,10 +51,6 @@ export default class WhoDisCommand extends CommandModule {
             })
             .then(() => this.api.getThreadHistory(msg.threadID, 0, this.recentMessagesCount))
             .then(history => this.getLastPhotoUrl(msg, history))
-            .catch(err => {
-                this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
-                throw err;
-            })
             .then(url => this.getResultWithShortUrls(url))
             .then(resultText => this.api.sendMessage(resultText, msg.threadID))
             .finally(() => {

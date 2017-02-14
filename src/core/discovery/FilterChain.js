@@ -10,15 +10,6 @@ export default class FilterChain {
      * @param {Configuration} config
      */
     constructor(config) {
-        /**
-         * Discover filters in modules/filters
-         * Register them all as singletons
-         * Get the filter-chain from config
-         * Resolve by string
-         *
-         * !! Throw exceptions when something is wrong
-         */
-
         const filterList = config.get("filter-chain");
         const instances = glob.sync("../../modules/filters/**/*.js", { cwd: __dirname })
             .map(fn => require(fn).default)
@@ -59,6 +50,6 @@ export default class FilterChain {
             promiseChain = promiseChain.then(msg => theFilter.filter(msg));
         }
 
-        return promiseChain;
+        return promiseChain.catch(err => console.error(err));
     }
 }

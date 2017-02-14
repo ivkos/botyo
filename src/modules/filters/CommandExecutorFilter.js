@@ -4,6 +4,8 @@ import Configuration from "../../core/config/Configuration";
 import ChatApi from "../../core/api/ChatApi";
 import glob from "glob";
 import CommandModule from "../CommandModule";
+import Promise from "bluebird";
+import FriendlyErrorHandler from "../../core/api/FriendlyErrorHandler";
 
 @Singleton
 @Inject(Configuration, ChatApi)
@@ -56,7 +58,7 @@ export default class CommandExecutorFilter extends FilterModule {
          */
         const module = this.commandNameToInstanceMap.get(commandName);
         if (module == undefined) {
-            console.log("Could not find module for command " + this.escape + commandName);
+            console.warn("Could not find module for command " + this.escape + commandName);
             return msg;
         }
 
@@ -68,10 +70,12 @@ export default class CommandExecutorFilter extends FilterModule {
 
             return msg;
         } else {
-            module.execute(msg, this.getArgsString(msg))
-                .catch(err => console.error(err));
-
-            return msg;
+            return new Promise(resolve => resolve(module.execute(msg, this.getArgsString(msg))))
+                .catch(err => FriendlyErrorHandler.handle(err, msg))
+                .catch(err => {
+                    console.error(err);
+                    return msg; // continue the filter chain
+                });
         }
     }
 
