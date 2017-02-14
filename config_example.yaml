@@ -90,9 +90,8 @@ modules:
 
     # Runs a reverse image search on the last picture in the chat
     WhoDisCommand:
-      enable: false
+      enable: true
       recentMessagesCount: 50           # how many recent messages to search for photos
-      googlApiKey: YOUR_GOOGL_API_KEY   # https://developers.google.com/url-shortener/v1/getting_started?csw=1#APIKey
 
 
   filters:
@@ -126,3 +125,7 @@ modules:
       enable: true
       executeOnStart: true
       interval: 60000       # 1*60*1000 ms = 1 min
+
+
+misc:
+  googlApiKey: YOUR_GOOGL_API_KEY   # https://developers.google.com/url-shortener/v1/getting_started?csw=1#APIKey

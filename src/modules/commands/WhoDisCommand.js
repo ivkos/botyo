@@ -3,19 +3,23 @@ import ChatApi from "../../core/api/ChatApi";
 import { dependencies as Inject } from "needlepoint";
 import Configuration from "../../core/config/Configuration";
 import Promise from "bluebird";
-import googl from "goo.gl";
+import GooglUrlShortener from "../../util/GooglUrlShortener";
 
-@Inject(Configuration, ChatApi)
+@Inject(Configuration, ChatApi, GooglUrlShortener)
 export default class WhoDisCommand extends CommandModule {
-    constructor(config, api) {
+    /**
+     * @param {Configuration} config
+     * @param {ChatApi} api
+     * @param {GooglUrlShortener} googl
+     */
+    constructor(config, api, googl) {
         super();
 
         this.config = config;
         this.api = api;
+        this.googl = googl;
 
         this.recentMessagesCount = config.getModuleConfig(this, "recentMessagesCount");
-
-        googl.setKey(config.getModuleConfig(this, "googlApiKey"));
     }
 
     getCommand() {
@@ -51,7 +55,7 @@ export default class WhoDisCommand extends CommandModule {
                 this.api.sendMessage("Sorry, something went wrong. \u{1F615}", msg.threadID);
                 throw err;
             })
-            .then(url => WhoDisCommand.getResultWithShortUrls(url))
+            .then(url => this.getResultWithShortUrls(url))
             .then(resultText => this.api.sendMessage(resultText, msg.threadID))
             .finally(() => {
                 endTypingIndicator();
@@ -92,11 +96,11 @@ export default class WhoDisCommand extends CommandModule {
      * @return {Promise.<string>}
      * @private
      */
-    static getResultWithShortUrls(url) {
+    getResultWithShortUrls(url) {
         return Promise.all([
-            googl.shorten(WhoDisCommand.getGoogleUrl(url)),
-            googl.shorten(WhoDisCommand.getBingUrl(url)),
-            googl.shorten(WhoDisCommand.getTinEyeUrl(url))
+            this.googl.shorten(WhoDisCommand.getGoogleUrl(url)),
+            this.googl.shorten(WhoDisCommand.getBingUrl(url)),
+            this.googl.shorten(WhoDisCommand.getTinEyeUrl(url))
         ]).then(result => {
             const googleShortUrl = result[0];
             const bingShortUrl = result[1];
