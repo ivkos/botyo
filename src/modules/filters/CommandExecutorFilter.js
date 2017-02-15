@@ -78,15 +78,12 @@ export default class CommandExecutorFilter extends FilterModule {
             // Send typing indicator to thread, showing progress for long-running commands
             const endTypingIndicatorFnPromise = this.api.sendTypingIndicator(msg.threadID);
 
-            return new Promise(resolve => resolve(module.execute(msg, this.getArgsString(msg))))
+            new Promise(resolve => resolve(module.execute(msg, this.getArgsString(msg))))
                 .catch(err => FriendlyErrorHandler.handle(err, msg))
-                .catch(err => {
-                    console.error(err);
-                    return msg; // continue the filter chain
-                })
-                .finally(() => {
-                    endTypingIndicatorFnPromise.then(endFn => endFn());
-                });
+                .catch(err => console.error(err))
+                .finally(() => endTypingIndicatorFnPromise.then(endFn => endFn()));
+
+            return msg;
         }
     }
 
