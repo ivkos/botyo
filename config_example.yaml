@@ -79,6 +79,11 @@ modules:
       cseId: CSE_ID                     # info how to obtain these:
       cseApiKey: CSE_API_KEY            # https://github.com/vdemedes/google-images
 
+    # Posts a Spotify track in the chat
+    SpotifyCommand:
+      enable: true
+      market: US   # An ISO 3166-1 alpha-2 country code. Only tracks playable in that market will be returned.
+
     # Returns some stats for the chat
     StatsCommand:
       enable: true

@@ -45,6 +45,7 @@
     "mongodb": "^2.2.11",
     "needlepoint": "^1.0.5",
     "request": "^2.75.0",
+    "spotify-web-api-node": "^2.3.6",
     "string-similarity": "^1.1.0",
     "tmp": "0.0.29",
     "yamljs": "^0.2.8"

@@ -110,6 +110,9 @@ In order for your modules to get auto-discovered and work correctly, they must e
 	* `#showme cat` - Shows you a picture of a cat.
 	* `#showme 3 cats` - Shows you three pictures of cats.
 	* `#showme "3 cats"` - Shows you a picture of three cats.
+* `#spotify <track>` - Posts a Spotify track in the chat. It is recommended to change the `market` option to your country code in `config.yaml` in order for songs to be playable.
+    * `#spotify Don't Let Me Down`
+    * `#spotify Tyga - Dope` - you can optionally include the artist for a more relevant result
 * `#stats` - Returns some stats for the chat, including but not limited to number of messages and number of participants.
 * `#translate [([from:]to)] <text>` - Translates text using Google Translate. Examples:
     * `#translate (en:fr) Hello!` - Translates "Hello!" from English to French
