@@ -98,6 +98,14 @@ modules:
       enable: true
       recentMessagesCount: 50           # how many recent messages to search for photos
 
+    # Posts a YouTube video in the chat
+    YouTubeCommand:
+      enable: false
+      regionCode: US                    # Return search results for the specified country. (ISO 3166-1 alpha-2 country code)
+      order: relevance                  # Method to use to order videos: date/rating/relevance/title/viewCount
+      safeSearch: moderate              # Whether the search results should include restricted content as well as standard content: moderate/none/strict
+      apiKey: YOUR_YOUTUBE_API_KEY      # https://developers.google.com/youtube/v3/docs/#calling-the-api
+
 
   filters:
     # Replies "<name> is risen!" when a person on the watch list

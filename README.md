@@ -120,6 +120,9 @@ In order for your modules to get auto-discovered and work correctly, they must e
     * `#translate (French) Hello!` - Automatically detects the language and translates to French
     * `#translate Bonjour!` - Automatically detects the language and translates to the default language set in `config.yaml`
 * `#whodis` - Runs a reverse image search on the last picture sent to the chat, and gives you links to the results.
+* `#yt <search query>` - Posts a YouTube video. Command is disabled by default, because it requires a YouTube API key. See `config.yaml` for instructions how to configure. Examples:
+    * `#yt Starboy`
+    * `#yt ozzy man cat vs mantis`
 
 ### Filters
 * `AutoEmojifyFilter` - Listens for messages containing emojifiable parts (e.g. "E X A M P L E"), emojifies them, and responds with the same message.
