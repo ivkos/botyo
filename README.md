@@ -100,6 +100,11 @@ In order for your modules to get auto-discovered and work correctly, they must e
 * `#ae <text>` - Returns the text aesthetically (un)pleasing, e.g. "hello" becomes "ｈｅｌｌｏ".
 * `#color <hex string>` - Changes the chat color.
 * `#emojify <text>` - Returns the text emojified, i.e. every letter and number are replaced with emoji ones.
+* `#ig [latest] <@user | #hashtag>` - Posts an Instagram photo of @user, or one tagged with #hashtag. Command is disabled by default, because it requires Instagram username and password in `config.yaml`. Examples:
+    * `#ig latest @ivkos` - Posts the newest photo uploaded by @ivkos
+    * `#ig latest #landscape` - Posts the newest photo tagged with #landscape
+    * `#ig @zuck` - Posts a random photo uploaded by @zuck
+    * `#ig #happy` - Posts a random photo tagged with #happy
 * `#lmgtfy <query>` - Googles that for you using [lmgtfy](https://lmgtfy.com/)
 * `#ping` - Makes the bot respond to the ping if it is online.
 * `#quote <person | me | all | *>` - Generates a faux quote using Markov chains based on messages in the chat.

@@ -48,9 +48,11 @@ modules:
     EmojifyCommand:
       enable: true
 
-    # Responds with a Kanye West quote
-    KanyeCommand:
-      enable: true
+    # Instagram integration
+    InstagramCommand:
+      enable: false
+      username: YOUR_INSTAGRAM_USERNAME
+      password: YOUR_INSTAGRAM_PASSWORD
 
     # Googles that for you
     LmgtfyCommand:
