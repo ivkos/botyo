@@ -39,23 +39,11 @@ export default class WhoDisCommand extends CommandModule {
     }
 
     execute(msg, argsString) {
-        let endTypingIndicator = () => {};
-
         return this.api
-            .markAsRead(msg.threadID)
-            .then(() => this.api.sendTypingIndicator(msg.threadID))
-            .then(endFn => endTypingIndicator = endFn)
-            .catch(err => {
-                console.warn(err);
-                return Promise.resolve();
-            })
-            .then(() => this.api.getThreadHistory(msg.threadID, 0, this.recentMessagesCount))
+            .getThreadHistory(msg.threadID, 0, this.recentMessagesCount)
             .then(history => this.getLastPhotoUrl(msg, history))
             .then(url => this.getResultWithShortUrls(url))
-            .then(resultText => this.api.sendMessage(resultText, msg.threadID))
-            .finally(() => {
-                endTypingIndicator();
-            });
+            .then(resultText => this.api.sendMessage(resultText, msg.threadID));
     }
 
     /**

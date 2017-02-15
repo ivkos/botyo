@@ -50,20 +50,11 @@ export default class ShowMeCommand extends CommandModule {
     }
 
     execute(msg, query) {
-        let endTypingIndicator = () => {};
         let tempFilesList = [];
 
         const opts = this.parseArgsString(query);
 
-        return this.api
-            .markAsRead(msg.threadID)
-            .then(() => this.api.sendTypingIndicator(msg.threadID))
-            .then(endFn => endTypingIndicator = endFn)
-            .catch(err => {
-                console.warn(err);
-                return Promise.resolve();
-            })
-            .then(() => this.getImageUrls(opts.query, opts.imageCount))
+        return this.getImageUrls(opts.query, opts.imageCount)
             .then(urls => this.createTempFilesForUrls(urls).then(paths => {
                 tempFilesList = paths;
 
@@ -86,13 +77,12 @@ export default class ShowMeCommand extends CommandModule {
             }))
             .then(theMessage => this.api.sendMessage(theMessage, msg.threadID))
             .finally(() => {
-                endTypingIndicator();
                 tempFilesList.forEach(path => fs.unlink(path));
             });
     }
 
     getImageUrls(query, imageCount) {
-        return this.imagesClient.search(query)
+        return Promise.resolve(this.imagesClient.search(query))
             .then(images => images
                 .slice(0, imageCount)
                 .map(i => i.url)

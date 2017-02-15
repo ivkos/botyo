@@ -46,6 +46,11 @@ export default class CommandExecutorFilter extends FilterModule {
             return msg;
         }
 
+        // Acknowledge receiving a command
+        // Sending a receipt immediately after receiving a message
+        // doesn't mark the last message as read for some reason, so delay it a bit
+        setTimeout(() => this.api.markAsRead(msg.threadID), 333);
+
         const commandName = this.getCommandNameOfMessage(msg);
 
         if (commandName == "help") {
@@ -70,11 +75,17 @@ export default class CommandExecutorFilter extends FilterModule {
 
             return msg;
         } else {
+            // Send typing indicator to thread, showing progress for long-running commands
+            const endTypingIndicatorFnPromise = this.api.sendTypingIndicator(msg.threadID);
+
             return new Promise(resolve => resolve(module.execute(msg, this.getArgsString(msg))))
                 .catch(err => FriendlyErrorHandler.handle(err, msg))
                 .catch(err => {
                     console.error(err);
                     return msg; // continue the filter chain
+                })
+                .finally(() => {
+                    endTypingIndicatorFnPromise.then(endFn => endFn());
                 });
         }
     }
