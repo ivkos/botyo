@@ -95,6 +95,9 @@ Modules reside in the `src/modules` directory. There a few types of modules:
 In order for your modules to get auto-discovered and work correctly, they must extend one of the base classes above.
 
 ## Preinstalled Modules
+
+Commands that target a specific person (e.g. `#ping <person>` or `#quote <person>`) work by calculating the similarity of the `<person>` string to the participants' identifiers. An identifier can be a person's given name, chat-local nickname, custom alias defined in `config.yaml`, or Facebook username. For example, `#quote john` and `#quote Johnny` would both yield a match against Johnny Appleseed.
+
 ### Commands
 * `#help` - Responds with a list of all available commands.
 * `#ae <text>` - Returns the text aesthetically (un)pleasing, e.g. "hello" becomes "ｈｅｌｌｏ".
@@ -106,9 +109,11 @@ In order for your modules to get auto-discovered and work correctly, they must e
     * `#ig @zuck` - Posts a random photo uploaded by @zuck
     * `#ig #happy` - Posts a random photo tagged with #happy
 * `#lmgtfy <query>` - Googles that for you using [lmgtfy](https://lmgtfy.com/)
-* `#ping` - Makes the bot respond to the ping if it is online.
+* `#ping [person]` - Responds to the ping, or sends a ping in a private message to a specific person. Examples:
+    * `#ping` - Makes the bot respond to the ping if it's online.
+    * `#ping Alice` - Sends a ping in a private message to Alice.
 * `#quote <person | me | all | *>` - Generates a faux quote using Markov chains based on messages in the chat.
-	* `#quote <person>` - Quotes a specific person identified by their name, chat nickname, custom alias (as defined in `config.yaml`), Facebook username, or a string that is close enough to those. This works by calculating the similarity of the string to the participants' identifiers, so for example `#quote abi` would quote Abigail.
+	* `#quote Alice` - Generates a quote by Alice.
 	* `#quote me` or simply `#quote` - Quotes the sender of the message.
 	* `#quote all` or `#quote *` - Builds a Markov chain based on all but the bot's messages in the chat, and generates an anonymous quote.
 * `#showme [number of images] <query>` - Returns the first few pictures found in Google Images matching the query. This command is disabled by default because it requires manual configuration of API keys needed to use the Google Search APIs. See `config.yaml` for instructions how to configure.
