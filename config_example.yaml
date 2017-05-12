@@ -126,21 +126,22 @@ modules:
     MessageRequestAcceptor:
       enable: true
       executeOnStart: true
-      interval: 300000      # 5*60*1000 ms = 5 min
+      interval: 300000      # 5 min * 60 s * 1000 ms
 
     # Downloads the chat history and saves it into the database
     # Note: QuoteCommand uses messages cached in the database,
     #       so ThreadHistoryDownloader must be enabled for QuoteCommand to work correctly.
+    # This scheduled task needn't run as often if MessageDownloadFilter is enabled
     ThreadHistoryDownloader:
       enable: true
       executeOnStart: true
-      interval: 900000      # 15*60*1000 ms = 15 min
+      interval: 10800000      # 3 h * 60 min * 60 s * 1000 ms
 
     # Updates the aliases for the participants in the chat room
     ThreadParticipantsUpdater:
       enable: true
       executeOnStart: true
-      interval: 60000       # 1*60*1000 ms = 1 min
+      interval: 300000       # 5 min * 60 s * 1000 ms
 
 
 misc:
