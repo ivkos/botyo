@@ -26,7 +26,7 @@ export default class HeIsRisenFilter extends FilterModule {
             return msg;
         }
 
-        this.api.getThreadHistory(msg.threadID, 0, this.msgLimit, parseInt(msg.timestamp) - 1)
+        this.api.getThreadHistory(msg.threadID, this.msgLimit, parseInt(msg.timestamp) - 1)
             .then(history => {
                 const senderHistory = history
                     .filter(m => msg.senderID == m.senderID.split("fbid:")[1])

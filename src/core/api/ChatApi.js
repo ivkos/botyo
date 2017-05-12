@@ -79,14 +79,14 @@ export default class ChatApi {
      * Returns chat history for the thread indicated by threadId.
      *
      * @param {number} threadId
-     * @param {number} start The ith message in the chat from which to start retrieving history.
-     * @param {number} end The jth message in the chat to which retrieving history.
-     * @param {number=} timestamp Used to described the end time. If set, will query messages up to and including timestamp.
+     * @param {number} amount The amount of messages to request
+     * @param {number=} timestamp Used to described the time of the most recent message to load. If timestamp is
+     *     undefined, facebook will load the most recent messages.
      *
      * @return {Promise.<Object[]>} promise with array of messages
      */
-    getThreadHistory(threadId, start, end, timestamp) {
-        return this._promisifyAndCache(this._rawApi.getThreadHistory)(threadId, start, end, timestamp);
+    getThreadHistory(threadId, amount, timestamp) {
+        return this._promisifyAndCache(this._rawApi.getThreadHistory)(threadId, amount, timestamp);
     }
 
     /**

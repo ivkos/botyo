@@ -61,7 +61,7 @@ export default class ThreadHistoryDownloader extends ScheduledTask {
                 () => (i * msgsPerRequest) >= messageCount,
                 done => {
                     return this.api
-                        .getThreadHistory(threadId, 0, msgsPerRequest, lastTimestamp)
+                        .getThreadHistory(threadId, msgsPerRequest, lastTimestamp)
                         .then(messages => {
                             if (messages.length === 0) {
                                 i++;

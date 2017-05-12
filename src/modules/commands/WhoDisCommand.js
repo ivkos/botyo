@@ -40,7 +40,7 @@ export default class WhoDisCommand extends CommandModule {
 
     execute(msg, argsString) {
         return this.api
-            .getThreadHistory(msg.threadID, 0, this.recentMessagesCount)
+            .getThreadHistory(msg.threadID, this.recentMessagesCount)
             .then(history => this.getLastPhotoUrl(msg, history))
             .then(url => this.getResultWithShortUrls(url))
             .then(resultText => this.api.sendMessage(resultText, msg.threadID));
