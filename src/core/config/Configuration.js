@@ -41,6 +41,17 @@ export default class Configuration {
     }
 
     /**
+     * Returns the configuration indicated by its 'property' if it exists, or a default value passed as 'other'
+     *
+     * @param {string} property
+     * @param {*} other default value to return if property is not defined in configuration
+     * @return {*}
+     */
+    getOrElse(property, other) {
+        return this.has(property) ? this.get(property) : other;
+    }
+
+    /**
      * Returns true if the property is defined in the configuration file, otherwise false
      *
      * @param {string} property
