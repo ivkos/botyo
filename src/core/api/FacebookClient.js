@@ -49,7 +49,8 @@ export default class FacebookClient extends AsyncResolvable {
                 }
 
                 api.setOptions({
-                    logLevel: "warn"
+                    logLevel: "warn",
+                    selfListen: !!this.config.getOrElse("app.selfListen", false)
                 });
 
                 this.api = api;

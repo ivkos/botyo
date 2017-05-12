@@ -23,6 +23,7 @@ app:
   stateFile: /data/app/appstate.json  # where to save the state of the Facebook chat API
   bannerFile: banner.txt              # file contents to print after listening has started
   commandEscape: "#"                  # character all commands to the bot should be preceded with (e.g. #ping)
+  selfListen: false                   # whether the bot should listen to and handle its own sent messages; beware of infinite loops!
 
 # List of filters each message gets passed through. Filters are applied in the order they are listed here.
 # Not listing a filter here disables it by not passing messages through it
