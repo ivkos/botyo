@@ -30,7 +30,7 @@ export default class ThreadParticipantsUpdater extends ScheduledTask {
             .then(threadInfos => threadInfos.map(info => {
                 const threadId = info._threadId;
 
-                if (info.nicknames && info.nicknames.length > 0) {
+                if (info.nicknames) {
                     Object.keys(info.nicknames).forEach(userId =>
                         this.threads.setAlias(threadId, parseInt(userId), info.nicknames[userId])
                     );
