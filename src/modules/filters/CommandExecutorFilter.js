@@ -119,6 +119,7 @@ export default class CommandExecutorFilter extends FilterModule {
         let str = "\u{1F527} Command list:\n\n";
 
         this.commandNameToInstanceMap.forEach((module, commandName) => {
+            if (module.isHidden()) return;
             str += this.escape + commandName + " - " + module.getDescription() + "\n";
         });
 

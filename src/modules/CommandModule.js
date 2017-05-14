@@ -53,4 +53,13 @@ export default class CommandModule {
     execute(msg, argsString) {
         return Promise.resolve();
     }
+
+    /**
+     * Returns true if this command should not be shown in the list of available commands.
+     *
+     * @return {boolean}
+     */
+    isHidden() {
+        return false;
+    }
 }
