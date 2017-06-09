@@ -112,10 +112,13 @@ Commands that target a specific person (e.g. `#ping <person>` or `#quote <person
 * `#ping [person]` - Responds to the ping, or sends a ping in a private message to a specific person. Examples:
     * `#ping` - Makes the bot respond to the ping if it's online.
     * `#ping Alice` - Sends a ping in a private message to Alice.
-* `#quote <person | me | all | *>` - Generates a faux quote using Markov chains based on messages in the chat.
+* `#quote [ <person> | me | all [ on <subject> ] ]` - Generates a faux quote using Markov chains based on messages in the chat.
 	* `#quote Alice` - Generates a quote by Alice.
 	* `#quote me` or simply `#quote` - Quotes the sender of the message.
 	* `#quote all` or `#quote *` - Builds a Markov chain based on all but the bot's messages in the chat, and generates an anonymous quote.
+	* `#quote me on JavaScript` - Generates a quote by the sender starting with 'JavaScript'.
+	* `#quote Alice on cats` - Generates a quote by Alice starting with 'cats'.
+	* `#quote all on the bot` - Generates a quote based on all messages, starting with 'the bot'.
 * `#showme [number of images] <query>` - Returns the first few pictures found in Google Images matching the query. This command is disabled by default because it requires manual configuration of API keys needed to use the Google Search APIs. See `config.yaml` for instructions how to configure.
 	* `#showme cat` - Shows you a picture of a cat.
 	* `#showme 3 cats` - Shows you three pictures of cats.

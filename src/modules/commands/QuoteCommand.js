@@ -8,6 +8,8 @@ import Bro from "brototype";
 import Db from "mongodb";
 import Promise from "bluebird";
 
+const QUOTE_ON_REGEX = /\s+(on\s+(.+))$/ui;
+
 @Inject(ChatApi, Configuration, Threads, Db)
 export default class QuoteCommand extends CommandModule {
     constructor(api, config, threads, db) {
@@ -38,7 +40,7 @@ export default class QuoteCommand extends CommandModule {
     }
 
     getUsage() {
-        return "[<person> | me]";
+        return "[ <person> | me | all [ on <subject> ] ]";
     }
 
     validate(msg, argsString) {
@@ -57,9 +59,19 @@ export default class QuoteCommand extends CommandModule {
             return this.api.sendMessage("\u{1F635}", threadId);
         }
 
+        let subject;
+        {
+            const matches = argsString.match(QUOTE_ON_REGEX);
+            if (matches == null || matches.length < 3) {
+                subject = undefined;
+            } else {
+                subject = matches[2].trim().toLowerCase();
+            }
+        }
+
         const sentencePromise = this.getMessages(threadId, targetId)
             .then(history => history.map(m => m.body))
-            .then(messages => this.buildMarkovSentence(messages));
+            .then(messages => this.buildMarkovSentence(messages, subject));
 
         const namePromise = targetId === -1
             ? Promise.resolve("\u{1F464}")
@@ -68,6 +80,9 @@ export default class QuoteCommand extends CommandModule {
         return Promise
             .all([sentencePromise, namePromise])
             .then(([sentence, name]) => {
+                if (!sentence)
+                    return "\u{1F4AC}\u{2753}";
+
                 return "“" + sentence + "”" + "\n"
                     + "– " + name;
             })
@@ -85,7 +100,10 @@ export default class QuoteCommand extends CommandModule {
             return msg.senderID;
         }
 
-        argsString = argsString.trim().toLowerCase();
+        argsString = argsString
+            .replace(QUOTE_ON_REGEX, "")
+            .trim()
+            .toLowerCase();
 
         if (argsString == "me") {
             return msg.senderID;
@@ -145,18 +163,35 @@ export default class QuoteCommand extends CommandModule {
 
     /**
      * @param {Array.<string>} messages
+     * @param {string=} subject
      * @return {string}
      * @private
      */
-    buildMarkovSentence(messages) {
+    buildMarkovSentence(messages, subject) {
         const markovski = this.createMarkovski();
+
+        if (subject) {
+            markovski.startWith(subject);
+        }
+
         messages.forEach(m => markovski.train(m));
 
         let sentence;
-        do {
+        if (!this.censorship) {
             sentence = markovski.generate();
+        } else {
+            // TODO: Consider externalizing tries count in configuration
+            for (let tries = 0; tries < 20; tries++) {
+                const candidate = markovski.generate();
+
+                if (!this.censorshipRegex.test(candidate)) {
+                    sentence = candidate;
+                    break;
+                }
+            }
         }
-        while (this.censorship && this.censorshipRegex.test(sentence));
+
+        if (sentence == subject) return;
 
         return sentence;
     }
