@@ -143,12 +143,24 @@ export default class QuoteCommand extends CommandModule {
     getMessages(threadId, targetId) {
         const filterList = [];
         if (targetId !== -1) {
-            filterList.push({ senderID: "fbid:" + targetId });
-        } else { // all
-            filterList.push({ senderID: { $ne: "fbid:" + this.api.getCurrentUserId() } }); // skip messages by the bot
+            filterList.push({
+                $or: [
+                    { senderID: "fbid:" + targetId },
+                    { senderID: "" + targetId }
+                ]
+            });
+        } else {
+            // messages by everyone but the bot
+            filterList.push({
+                $and: [
+                    { senderID: { $ne: "fbid:" + this.api.getCurrentUserId() } },
+                    { senderID: { $ne: "" + this.api.getCurrentUserId() } }
+                ]
+            });
         }
 
         filterList.push(
+            { type: "message" },
             { attachments: { $size: 0 } },
             { body: { $exists: true } },
             { body: { $ne: "" } },
