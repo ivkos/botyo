@@ -39,7 +39,7 @@
     "glob": "^7.1.1",
     "goo.gl": "^0.1.4",
     "google-images": "^2.0.0",
-    "google-translate-api": "^2.2.2",
+    "google-translate-api": "^2.3.0",
     "instagram-private-api": "^0.5.12",
     "markovski": "^1.4.2",
     "mime-types": "^2.1.12",
