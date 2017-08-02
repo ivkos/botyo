@@ -41,7 +41,7 @@
     "google-images": "^2.0.0",
     "google-translate-api": "^2.3.0",
     "instagram-private-api": "^0.5.12",
-    "markovski": "^1.4.2",
+    "markovski": "^1.5.1",
     "mime-types": "^2.1.12",
     "moment": "^2.15.2",
     "mongodb": "^2.2.11",
