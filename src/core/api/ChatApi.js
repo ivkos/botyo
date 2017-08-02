@@ -165,6 +165,18 @@ export default class ChatApi {
         return this._promisifyAndCache(this._rawApi.handleMessageRequest)(threadId, isAccepted);
     }
 
+    /**
+     * Sets a reaction to a message. Reaction can be one of the following:
+     * <pre>:love: :haha: :wow: :sad: :angry: :like: :dislike:</pre>
+     *
+     * @param {string} reaction the reaction
+     * @param messageId the message ID
+     * @return {Promise} empty promise
+     */
+    setMessageReaction(reaction, messageId) {
+        return this._promisifyAndCache(this._rawApi.setMessageReaction)(reaction, messageId);
+    }
+
    /**
     * @param {function} fn
     * @private
