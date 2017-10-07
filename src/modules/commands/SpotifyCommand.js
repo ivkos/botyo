@@ -21,7 +21,13 @@ export default class SpotifyCommand extends CommandModule {
         this.api = api;
         this.googl = googl;
 
-        this.spotify = new Spotify();
+        this.spotify = new Spotify({
+          clientId: config.getModuleConfig(this, "clientId"),
+          clientSecret: config.getModuleConfig(this, "clientSecret")
+        })
+
+        this.authenticate(this.spotify);
+
         this.market = config.getModuleConfig(this, "market");
     }
 
@@ -41,7 +47,33 @@ export default class SpotifyCommand extends CommandModule {
         return argsString && argsString.length > 0;
     }
 
+    authenticate(spotify) {
+      spotify.clientCredentialsGrant()
+        .then(function(data) {
+          console.log('The access token expires in ' + data.body['expires_in']);
+          console.log('The access token is ' + data.body['access_token']);
+
+          // Save the access token so that it's used in future calls
+          spotify.setAccessToken(data.body['access_token']);
+        }, function(err) {
+              console.log('Something went wrong when retrieving an access token', err);
+        });
+    }
+
+    refreshToken(spotify) {
+      spotify.refreshAccessToken()
+        .then(function(data) {
+          console.log('The access token has been refreshed!');
+
+          // Save the access token so that it's used in future calls
+          spotify.setAccessToken(data.body['access_token']);
+        }, function(err) {
+          console.log('Could not refresh access token', err);
+        });
+    }
+
     execute(msg, argsString) {
+        this.refreshToken(this.spotify);
         return Promise.resolve(this.spotify.searchTracks(argsString, { market: this.market, limit: 1 }))
             .then(data => {
                 if (bro(data.body).doYouEven("tracks.items.0")) {

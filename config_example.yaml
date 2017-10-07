@@ -86,6 +86,8 @@ modules:
     SpotifyCommand:
       enable: true
       market: US   # An ISO 3166-1 alpha-2 country code. Only tracks playable in that market will be returned.
+      clientId: ''
+      clientSecret: ''
 
     # Returns some stats for the chat
     StatsCommand:
