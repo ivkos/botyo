@@ -34,7 +34,7 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.16.0",
     "bluebird": "^3.4.6",
     "brototype": "^0.0.6",
-    "facebook-chat-api": "Schmavery/facebook-chat-api#3f75948e9fb16cc3fee8db9d643dfdf195a250fb",
+    "facebook-chat-api": "Schmavery/facebook-chat-api#44a8adcb49750d74f7c30393547f6caacbe35bbe",
     "find-hashtags": "^1.0.1",
     "glob": "^7.1.1",
     "goo.gl": "^0.1.4",
