@@ -1,7 +1,7 @@
 import { ApplicationConfiguration, AsyncResolvable, ChatApi, Logger } from "botyo-api";
 import { inject, injectable, interfaces } from "inversify";
 import * as fs from "fs";
-import { FacebookChatApi } from "../chat/FacebookChatApi";
+import { FacebookChatApi } from "../../chat/FacebookChatApi";
 import { LoggerInstance } from "winston";
 import ServiceIdentifier = interfaces.ServiceIdentifier;
 
@@ -54,12 +54,12 @@ export default class AsyncResolvableFacebookChatApi extends AsyncResolvable<Chat
                 return doResolve(new FacebookChatApi(api));
             });
         });
-    };
+    }
 
     getServiceIdentifier(): ServiceIdentifier<ChatApi>
     {
         return ChatApi;
-    };
+    }
 
     private removePasswordFromConfiguration()
     {
