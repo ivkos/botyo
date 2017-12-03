@@ -37,7 +37,7 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
         await this.populateParticipantsInfo();
     }
 
-    private async resolveDeclaredVanityNamesToIds()
+    async resolveDeclaredVanityNamesToIds()
     {
         return this.chatThreadUtils.forEachParticipantInEachChatThread(async (chatThreadId,
                                                                               participantVanityOrId,
@@ -84,7 +84,7 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
         });
     }
 
-    private async populateActualParticipants()
+    async populateActualParticipants()
     {
         const chatThreadsObj =
             this.applicationConfiguration.getProperty(CONFIG_KEY_CHAT_THREADS) as ConfigurationChatThreadsObject;
@@ -122,7 +122,7 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
         }
     }
 
-    private async populateParticipantsInfo()
+    async populateParticipantsInfo()
     {
         const idsSet: Set<string> = new Set();
 
