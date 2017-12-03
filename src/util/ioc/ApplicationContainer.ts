@@ -15,9 +15,13 @@ import LoggingUtils, { LOGGER_NAME } from "../logging/LoggingUtils";
 import * as _ from "lodash";
 import ModuleRegistry from "./ModuleRegistry";
 import ChatThreadUtilsImpl from "../ChatThreadUtilsImpl";
+import FilterChain from "../../modules/util/FilterChain";
+import TaskScheduler from "../../modules/util/TaskScheduler";
 import Newable = interfaces.Newable;
 import ServiceIdentifier = interfaces.ServiceIdentifier;
+import TypeUtils from "../TypeUtils";
 
+const METADATA_KEYS = require("inversify/lib/constants/metadata_keys");
 
 export default class ApplicationContainer
 {
@@ -54,6 +58,11 @@ export default class ApplicationContainer
             this.container.get(ChatThreadUtils)
         );
 
+        const theirRootModuleClass = TypeUtils.getPrototypeChain(moduleClass).find(c => c.name === Module.name);
+        if (!Reflect.hasOwnMetadata(METADATA_KEYS.PARAM_TYPES, theirRootModuleClass as Function)) {
+            decorate(injectable(), theirRootModuleClass);
+        }
+
         this.container.bind<M>(serviceIdentifier).to(moduleClass).inSingletonScope();
         const module = this.container.get(moduleClass);
 
@@ -71,7 +80,7 @@ export default class ApplicationContainer
 
         if (result === undefined ||
             resolvable.getServiceIdentifier() === EmptyAsyncResolvable.EMPTY_IDENTIFIER ||
-            resolvable instanceof EmptyAsyncResolvable) {
+            TypeUtils.likeInstanceOf(resolvable, EmptyAsyncResolvable)) {
             return;
         }
 
@@ -85,6 +94,9 @@ export default class ApplicationContainer
 
     private bindInternals()
     {
+        this.container.bind(FilterChain).toSelf().inSingletonScope();
+        this.container.bind(TaskScheduler).toSelf().inSingletonScope();
+
         this.container.bind(ChatThreadUtils).to(ChatThreadUtilsImpl).inSingletonScope();
         this.container.bind(ModuleRegistry).toSelf().inSingletonScope();
 

@@ -3,6 +3,7 @@ import YamlApplicationConfiguration from "./config/YamlApplicationConfiguration"
 import Botyo from "./Botyo";
 import { interfaces } from "inversify";
 import FriendlyCommandErrorHandler from "./modules/FriendlyCommandErrorHandler";
+import TypeUtils from "./util/TypeUtils";
 import Newable = interfaces.Newable;
 
 export default class BotyoBuilder
@@ -25,7 +26,7 @@ export default class BotyoBuilder
             return this;
         }
 
-        if (!(config instanceof ApplicationConfiguration)) {
+        if (!TypeUtils.likeInstanceOf(config, ApplicationConfiguration)) {
             throw new Error(`Configuration must be the path to the configuration file ` +
                 `or an instance of ${ApplicationConfiguration.name}`);
         }
@@ -80,7 +81,7 @@ export default class BotyoBuilder
             throw new Error(`Argument must be a constructor of a ${parentClazz.name}`);
         }
 
-        if (!parentClazz.isPrototypeOf(clazz)) {
+        if (!TypeUtils.isClassDescendantOf(clazz, parentClazz)) {
             throw new Error(`The specified class '${clazz.name}' must be a subtype of ${parentClazz.name}`);
         }
     }

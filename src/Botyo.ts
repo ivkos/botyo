@@ -22,6 +22,8 @@ import { LoggerInstance } from "winston";
 import LoggingUtils from "./util/logging/LoggingUtils";
 import HelpCommand from "./modules/HelpCommand";
 import * as path from "path";
+import ChatThreadParticipantsUpdaterScheduledTask from "./modules/ChatThreadParticipantsUpdaterScheduledTask";
+import TaskScheduler from "./modules/util/TaskScheduler";
 import Newable = interfaces.Newable;
 
 export default class Botyo
@@ -51,11 +53,12 @@ export default class Botyo
         this.bindModuleConfigs();
         this.bindModules();
         this.attachFilterChainMessageListener();
+        this.startTaskScheduler();
     }
 
     async stop(): Promise<void>
     {
-
+        // TODO Implement
     }
 
     private async bindAsyncResolvables()
@@ -81,6 +84,7 @@ export default class Botyo
 
     private bindModules()
     {
+        this.applicationContainer.bindToSelfAndGet(ChatThreadParticipantsUpdaterScheduledTask);
         this.applicationContainer.bindToSelfAndGet(ChatThreadFilter);
         this.applicationContainer.bindAndGet(CommandErrorHandlerModule, this.commandErrorHandler);
         this.applicationContainer.bindToSelfAndGet(HelpCommand);
@@ -105,6 +109,12 @@ export default class Botyo
 
             filterChain.pass(msg);
         });
+    }
+
+    private startTaskScheduler()
+    {
+        const taskScheduler = this.applicationContainer.getIoCContainer().get(TaskScheduler);
+        taskScheduler.start();
     }
 
     static builder()
