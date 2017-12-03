@@ -17,7 +17,7 @@ import AsyncResolvableChatParticipantsResolver from "./util/AsyncResolvableChatP
 import * as fs from "fs";
 import ChatThreadFilter from "./modules/ChatThreadFilter";
 import CommandExecutorFilter from "./modules/CommandExecutorFilter";
-import FilterChain from "./modules/FilterChain";
+import FilterChain from "./modules/util/FilterChain";
 import { LoggerInstance } from "winston";
 import LoggingUtils from "./util/logging/LoggingUtils";
 import HelpCommand from "./modules/HelpCommand";

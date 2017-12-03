@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import ModuleRegistry from "../util/ioc/ModuleRegistry";
+import ModuleRegistry from "../../util/ioc/ModuleRegistry";
 import { Logger, Message } from "botyo-api";
 import { LoggerInstance } from "winston";
 
