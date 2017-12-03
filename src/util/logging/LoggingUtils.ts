@@ -2,7 +2,7 @@ import { Logger, LoggerInstance, transports } from "winston";
 
 const Console = transports.Console;
 
-export const LOGGER_NAME = Symbol("LOGGER_NAME");
+export const LOGGER_NAME = Symbol.for("BOTYO_LOGGER_NAME");
 
 namespace LoggingUtils
 {
