@@ -1,3 +1,3 @@
 import Botyo from "./Botyo";
 
-export = Botyo;
+export default Botyo;
