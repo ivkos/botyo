@@ -25,7 +25,7 @@
   "homepage": "https://github.com/ivkos/botyo#readme",
   "dependencies": {
     "bluebird": "^3.5.1",
-    "botyo-api": "^2.0.0-alpha.5",
+    "botyo-api": "^2.0.0-alpha.6",
     "facebook-chat-api": "github:Schmavery/facebook-chat-api#7552ce69561ac424cf6461e4c0cd8762ae2a7b9f",
     "inversify": "^4.5.2",
     "js-yaml": "^3.10.0",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@types/bluebird": "^3.5.18",
     "@types/js-yaml": "^3.10.1",
-    "@types/lodash": "^4.14.85",
+    "@types/lodash": "^4.14.87",
     "@types/node-schedule": "^1.2.1",
     "@types/string-similarity": "^1.2.0",
     "@types/winston": "^2.3.7",
