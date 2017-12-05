@@ -17,9 +17,9 @@ import ModuleRegistry from "./ModuleRegistry";
 import ChatThreadUtilsImpl from "../ChatThreadUtilsImpl";
 import FilterChain from "../../modules/util/FilterChain";
 import TaskScheduler from "../../modules/util/TaskScheduler";
+import TypeUtils from "../TypeUtils";
 import Newable = interfaces.Newable;
 import ServiceIdentifier = interfaces.ServiceIdentifier;
-import TypeUtils from "../TypeUtils";
 
 const METADATA_KEYS = require("inversify/lib/constants/metadata_keys");
 
@@ -74,6 +74,14 @@ export default class ApplicationContainer
 
     public async bindAndResolveAsyncResolvable<R>(arClass: Newable<AsyncResolvable<R>>): Promise<void>
     {
+        const theirRootAsyncResolvableClass = TypeUtils
+            .getPrototypeChain(arClass)
+            .find(c => c.name === AsyncResolvable.name);
+
+        if (!Reflect.hasOwnMetadata(METADATA_KEYS.PARAM_TYPES, theirRootAsyncResolvableClass as Function)) {
+            decorate(injectable(), theirRootAsyncResolvableClass);
+        }
+
         this.container.bind<AsyncResolvable<R>>(arClass).toSelf().inSingletonScope();
 
         const resolvable = this.container.get(arClass);
