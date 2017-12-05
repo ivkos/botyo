@@ -38,7 +38,7 @@ namespace TypeUtils
         return chain;
     }
 
-    export function ifInstanceOf<T>(obj: any, clazz: Newable<T> | Abstract<T>, fn: (arg: T) => any)
+    export function ifLikeInstanceOf<T>(obj: any, clazz: Newable<T> | Abstract<T>, fn: (arg: T) => any)
     {
         if (likeInstanceOf(obj, clazz as Function)) {
             fn(obj as T);

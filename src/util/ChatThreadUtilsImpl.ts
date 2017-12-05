@@ -16,7 +16,7 @@ const SIMILARITY_THRESHOLD = 0.5;
 
 export default class ChatThreadUtilsImpl extends ChatThreadUtils
 {
-    constructor(@inject(ApplicationConfiguration) private readonly appConfig: ApplicationConfiguration,
+    constructor(@inject(ApplicationConfiguration.SYMBOL) private readonly appConfig: ApplicationConfiguration,
                 @inject(Logger) private readonly logger: LoggerInstance)
     {
         super();

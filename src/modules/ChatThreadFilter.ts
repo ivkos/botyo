@@ -4,7 +4,7 @@ import { LoggerInstance } from "winston";
 
 export default class ChatThreadFilter extends FilterModule
 {
-    constructor(@inject(ApplicationConfiguration) private readonly applicationConfiguration: ApplicationConfiguration,
+    constructor(@inject(ApplicationConfiguration.SYMBOL) private readonly applicationConfiguration: ApplicationConfiguration,
                 @inject(Logger) private readonly logger: LoggerInstance)
     {
         super();

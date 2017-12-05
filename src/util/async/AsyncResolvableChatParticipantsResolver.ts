@@ -22,10 +22,10 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
 {
     private readonly vanityNameToUserIdMap: Map<string, FacebookId> = new Map();
 
-    constructor(@inject(ChatApi) private readonly chatApi: ChatApi,
-                @inject(ApplicationConfiguration) private readonly applicationConfiguration: ApplicationConfiguration,
+    constructor(@inject(ChatApi.SYMBOL) private readonly chatApi: ChatApi,
+                @inject(ApplicationConfiguration.SYMBOL) private readonly applicationConfiguration: ApplicationConfiguration,
                 @inject(Logger) private readonly logger: LoggerInstance,
-                @inject(ChatThreadUtils) private readonly chatThreadUtils: ChatThreadUtils)
+                @inject(ChatThreadUtils.SYMBOL) private readonly chatThreadUtils: ChatThreadUtils)
     {
         super();
     }

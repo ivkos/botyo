@@ -86,7 +86,7 @@ export default class Botyo
     {
         this.applicationContainer.bindToSelfAndGet(ChatThreadParticipantsUpdaterScheduledTask);
         this.applicationContainer.bindToSelfAndGet(ChatThreadFilter);
-        this.applicationContainer.bindAndGet(CommandErrorHandlerModule, this.commandErrorHandler);
+        this.applicationContainer.bindAndGet(CommandErrorHandlerModule.SYMBOL, this.commandErrorHandler);
         this.applicationContainer.bindToSelfAndGet(HelpCommand);
 
         for (let moduleClass of this.modules) {
@@ -99,7 +99,7 @@ export default class Botyo
     private attachFilterChainMessageListener()
     {
         const filterChain = this.applicationContainer.getIoCContainer().get(FilterChain);
-        const chatApi = this.applicationContainer.getIoCContainer().get(ChatApi) as ChatApi & MessageListener;
+        const chatApi = this.applicationContainer.getIoCContainer().get(ChatApi.SYMBOL) as ChatApi & MessageListener;
 
         chatApi.listen((err, msg) => {
             if (err) {

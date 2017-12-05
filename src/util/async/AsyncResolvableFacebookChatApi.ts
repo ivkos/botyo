@@ -12,7 +12,7 @@ export default class AsyncResolvableFacebookChatApi extends AsyncResolvable<Chat
 {
     private readonly cookiesFilePath: string;
 
-    constructor(@inject(ApplicationConfiguration) private readonly applicationConfiguration: ApplicationConfiguration,
+    constructor(@inject(ApplicationConfiguration.SYMBOL) private readonly applicationConfiguration: ApplicationConfiguration,
                 @inject(Logger) private readonly logger: LoggerInstance)
     {
         super();
@@ -58,7 +58,7 @@ export default class AsyncResolvableFacebookChatApi extends AsyncResolvable<Chat
 
     getServiceIdentifier(): ServiceIdentifier<ChatApi>
     {
-        return ChatApi;
+        return ChatApi.SYMBOL;
     }
 
     private removePasswordFromConfiguration()

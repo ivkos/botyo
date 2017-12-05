@@ -16,7 +16,7 @@ import * as Bluebird from "bluebird";
 export default class CommandExecutorFilter extends FilterModule
 {
     constructor(@inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry,
-                @inject(CommandErrorHandlerModule) private readonly errorHandler: CommandErrorHandlerModule,
+                @inject(CommandErrorHandlerModule.SYMBOL) private readonly errorHandler: CommandErrorHandlerModule,
                 @inject(Logger) private readonly logger: LoggerInstance)
     {
         super();

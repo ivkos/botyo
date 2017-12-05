@@ -41,6 +41,7 @@ export default class ApplicationContainer
     public bindApplicationConfiguration(ac: ApplicationConfiguration)
     {
         this.container.bind<ApplicationConfiguration>(ApplicationConfiguration).toConstantValue(ac);
+        this.container.bind<ApplicationConfiguration>(ApplicationConfiguration.SYMBOL).toConstantValue(ac);
     }
 
     public bindToSelfAndGet<M extends Module>(moduleClass: Newable<M>): M
@@ -52,10 +53,10 @@ export default class ApplicationContainer
     {
         moduleClass.prototype.runtime = new ModuleAwareRuntime(
             moduleClass,
-            this.container.get(ChatApi),
-            this.container.get(ApplicationConfiguration),
+            this.container.get(ChatApi.SYMBOL),
+            this.container.get(ApplicationConfiguration.SYMBOL),
             this.container.getTagged(Logger, LOGGER_NAME, moduleClass.name),
-            this.container.get(ChatThreadUtils)
+            this.container.get(ChatThreadUtils.SYMBOL)
         );
 
         const theirRootModuleClass = TypeUtils.getPrototypeChain(moduleClass).find(c => c.name === Module.name);
@@ -64,7 +65,7 @@ export default class ApplicationContainer
         }
 
         this.container.bind<M>(serviceIdentifier).to(moduleClass).inSingletonScope();
-        const module = this.container.get(moduleClass);
+        const module = this.container.get(serviceIdentifier);
 
         this.container.get(ModuleRegistry).register(module);
 
@@ -94,11 +95,13 @@ export default class ApplicationContainer
 
     private bindInternals()
     {
-        this.container.bind(FilterChain).toSelf().inSingletonScope();
-        this.container.bind(TaskScheduler).toSelf().inSingletonScope();
+        this.container.bind<FilterChain>(FilterChain).toSelf().inSingletonScope();
+        this.container.bind<TaskScheduler>(TaskScheduler).toSelf().inSingletonScope();
 
-        this.container.bind(ChatThreadUtils).to(ChatThreadUtilsImpl).inSingletonScope();
-        this.container.bind(ModuleRegistry).toSelf().inSingletonScope();
+        this.container.bind<ChatThreadUtils>(ChatThreadUtils).to(ChatThreadUtilsImpl).inSingletonScope();
+        this.container.bind<ChatThreadUtils>(ChatThreadUtils.SYMBOL).to(ChatThreadUtilsImpl).inSingletonScope();
+
+        this.container.bind<ModuleRegistry>(ModuleRegistry).toSelf().inSingletonScope();
 
         this.container.bind<LoggerInstance>(Logger).toDynamicValue(ctx => {
             let loggerName;
