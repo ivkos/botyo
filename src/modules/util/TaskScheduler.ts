@@ -25,6 +25,12 @@ export default class TaskScheduler
         for (let module of this.registry.getScheduledTaskModules()) {
             const taskName = module.constructor.name;
 
+            const isEnabled = module.getRuntime().getConfiguration().isEnabled();
+            if (!isEnabled) {
+                this.logger.warn(`Scheduled task '${taskName}' is disabled`);
+                continue;
+            }
+
             const schedule = module.getSchedule();
             if (typeof schedule === "string") {
                 const job = Scheduler.scheduleJob(schedule, () => this.runTask(module));
@@ -41,6 +47,10 @@ export default class TaskScheduler
                     `Scheduled task '${taskName}' will not be scheduled to run ` +
                     `because its schedule is set to '${schedule}'`
                 );
+            }
+
+            if (module.shouldExecuteOnStart()) {
+                setTimeout(() => this.runTask(module), 0);
             }
         }
     }
