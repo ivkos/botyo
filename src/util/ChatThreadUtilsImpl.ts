@@ -22,9 +22,17 @@ export default class ChatThreadUtilsImpl extends ChatThreadUtils
         super();
     }
 
+    getChatThreadIds(): FacebookId[]
+    {
+        return _.keys(this.appConfig.getProperty(CONFIG_KEY_CHAT_THREADS));
+    }
+
     getNickname(threadId: FacebookId, participantId: FacebookId): string | undefined
     {
-        return this.appConfig.getOrElse(`${CONFIG_KEY_CHAT_THREADS}[${threadId}].${CONFIG_KEY_PARTICIPANTS}[${participantId}].nickname`, undefined);
+        return this.appConfig.getOrElse(
+            `${CONFIG_KEY_CHAT_THREADS}[${threadId}].${CONFIG_KEY_PARTICIPANTS}[${participantId}].nickname`,
+            undefined
+        );
     }
 
     getName(userId: FacebookId): string
@@ -105,7 +113,8 @@ export default class ChatThreadUtilsImpl extends ChatThreadUtils
 
         this.logger.warn(
             `Could not match addressee '${addressee}' to participant. ` +
-            `Closest match was '${max.match}' with ${max.rating.toFixed(2)} confidence (< ${SIMILARITY_THRESHOLD.toFixed(2)})`
+            `Closest match was '${max.match}' with ${max.rating.toFixed(2)} confidence ` +
+            `(< ${SIMILARITY_THRESHOLD.toFixed(2)})`
         );
 
         return undefined;
