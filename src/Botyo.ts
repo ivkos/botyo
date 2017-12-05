@@ -44,6 +44,9 @@ export default class Botyo
         Botyo.printBanner();
 
         this.logger = LoggingUtils.createLogger("Botyo", true);
+        process.on('unhandledRejection', reason => {
+            this.logger.error(reason);
+        });
 
         this.applicationContainer = ApplicationContainer.create();
         this.applicationConfiguration = this.applicationConfigurationProvider.call(this);
