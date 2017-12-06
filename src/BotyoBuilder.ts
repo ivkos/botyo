@@ -36,10 +36,12 @@ export default class BotyoBuilder
         return this;
     }
 
-    registerBundle<B extends Bundle>(bundle: Bundle)
+    registerBundle(bundle: Bundle): this
     {
         bundle.asyncResolvables.forEach(ar => this.registerAsyncResolvable(ar));
         bundle.modules.forEach(m => this.registerModule(m));
+
+        return this;
     }
 
     registerAsyncResolvable<R>(clazz: Newable<AsyncResolvable<R>>): this
