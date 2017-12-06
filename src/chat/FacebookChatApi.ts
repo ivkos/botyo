@@ -45,7 +45,7 @@ export class FacebookChatApi extends ChatApi implements MessageListener
 
     async getThreadHistory(threadId: FacebookId, amount: number, timestamp?: number): Promise<Message[]>
     {
-        return this.cachify(this.facebookChatApi.getThreadHistory)(threadId, amount, timestamp);
+        return this.cachify(this.facebookChatApi.getThreadHistoryGraphQL)(threadId, amount, timestamp);
     }
 
     async sendTypingIndicator(threadId: FacebookId): Promise<EndTypingIndicatorFunction>
