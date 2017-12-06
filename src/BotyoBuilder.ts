@@ -1,4 +1,4 @@
-import { ApplicationConfiguration, AsyncResolvable, CommandErrorHandlerModule, Module } from "botyo-api";
+import { ApplicationConfiguration, AsyncResolvable, Bundle, CommandErrorHandlerModule, Module } from "botyo-api";
 import YamlApplicationConfiguration from "./config/YamlApplicationConfiguration";
 import Botyo from "./Botyo";
 import { interfaces } from "inversify";
@@ -34,6 +34,12 @@ export default class BotyoBuilder
         this.applicationConfigurationProvider = () => config;
 
         return this;
+    }
+
+    registerBundle<B extends Bundle>(bundle: Bundle)
+    {
+        bundle.asyncResolvables.forEach(ar => this.registerAsyncResolvable(ar));
+        bundle.modules.forEach(m => this.registerModule(m));
     }
 
     registerAsyncResolvable<R>(clazz: Newable<AsyncResolvable<R>>): this
