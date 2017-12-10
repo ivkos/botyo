@@ -99,6 +99,11 @@ export class FacebookChatApi extends ChatApi implements MessageListener
         return this.cachify(this.facebookChatApi.setMessageReaction)(reaction, messageId);
     }
 
+    async resolvePhotoUrl(photoId: FacebookId): Promise<string>
+    {
+        return this.cachify(this.facebookChatApi.resolvePhotoUrl)(photoId);
+    }
+
     private cachify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any>
     {
         let promisifiedFn = this.facebookChatApiFnToPromisifiedFnMap.get(fn);
