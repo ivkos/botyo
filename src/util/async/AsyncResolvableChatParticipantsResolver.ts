@@ -90,6 +90,8 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
             this.applicationConfiguration.getProperty(CONFIG_KEY_CHAT_THREADS) as ConfigurationChatThreadsObject;
 
         for (let chatThreadId of _.keys(chatThreadsObj)) {
+            chatThreadsObj[chatThreadId] = chatThreadsObj[chatThreadId] || {};
+
             let threadInfo;
             try {
                 threadInfo = await this.chatApi.getThreadInfo(chatThreadId);

@@ -127,6 +127,8 @@ export default class ChatThreadUtilsImpl extends ChatThreadUtils
         let promises: Promise<any>[] = [];
 
         for (let chatThreadId of _.keys(chatThreadsObj)) {
+            chatThreadsObj[chatThreadId] = chatThreadsObj[chatThreadId] || {};
+
             const participantsObj = _.get(chatThreadsObj[chatThreadId], CONFIG_KEY_PARTICIPANTS, {});
 
             for (let participantVanityOrId of _.keys(participantsObj)) {
