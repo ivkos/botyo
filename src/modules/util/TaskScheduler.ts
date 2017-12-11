@@ -20,8 +20,6 @@ export default class TaskScheduler
 
     start()
     {
-        Bluebird.config({ cancellation: true });
-
         for (let module of this.registry.getScheduledTaskModules()) {
             const taskName = module.constructor.name;
 
@@ -63,7 +61,6 @@ export default class TaskScheduler
         this.taskToCronJobMap.forEach(job => job.cancel());
         this.taskToCronJobMap.clear();
 
-        this.taskToExecutePromiseMap.forEach(promise => promise.cancel());
         this.taskToExecutePromiseMap.clear();
 
         this.logger.info("Task scheduler has been stopped");
