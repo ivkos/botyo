@@ -58,8 +58,8 @@ export default class HelpCommand extends CommandModule
 
         if (commandModule === undefined) {
             return this.getRuntime().getChatApi().sendMessage(
-                `\u26A0 Unknown command: ${prefix}${commandName}`,
-                msg.threadID
+                msg.threadID,
+                `\u26A0 Unknown command: ${prefix}${commandName}`
             );
         }
 
