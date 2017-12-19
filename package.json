@@ -1,6 +1,6 @@
 {
   "name": "botyo",
-  "version": "2.0.0-alpha.19",
+  "version": "2.0.0-alpha.20",
   "description": "Botyo Runtime Components",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -25,9 +25,9 @@
   "homepage": "https://github.com/ivkos/botyo#readme",
   "dependencies": {
     "bluebird": "^3.5.1",
-    "botyo-api": "^2.0.0-alpha.14",
+    "botyo-api": "^2.0.0-alpha.16",
     "facebook-chat-api": "github:ivkos/facebook-chat-api#d50fee06b5dcc3c5ae51df31fd4388f4b858ead9",
-    "inversify": "^4.6.0",
+    "inversify": "^4.9.0",
     "js-yaml": "^3.10.0",
     "lodash": "^4.17.4",
     "node-schedule": "^1.2.5",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@types/bluebird": "^3.5.18",
     "@types/js-yaml": "^3.10.1",
-    "@types/lodash": "^4.14.87",
+    "@types/lodash": "^4.14.91",
     "@types/node-schedule": "^1.2.1",
     "@types/string-similarity": "^1.2.0",
     "@types/winston": "^2.3.7",
