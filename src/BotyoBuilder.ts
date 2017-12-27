@@ -100,7 +100,7 @@ export default class BotyoBuilder
             throw new Error(`Argument must be a constructor of a ${requiredInterfaceName}`);
         }
 
-        if (!typeGuardFn(clazz)) {
+        if (!typeGuardFn(clazz.prototype)) {
             throw new Error(`The specified class '${clazz.name}' must conform to the ${requiredInterfaceName} interface`);
         }
     }
