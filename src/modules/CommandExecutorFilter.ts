@@ -70,16 +70,8 @@ export default class CommandExecutorFilter extends AbstractFilterModule
 
         const endFnPromise = chatApi.sendTypingIndicator(msg.threadID);
 
-        // wrap in promise in case dev forgets to declare execute() as async
-        const executePromise = new Promise((resolve, reject) => {
-            try {
-                resolve(commandModule.execute(msg, args));
-            } catch (err) {
-                reject(err);
-            }
-        });
-
-        return Bluebird.resolve(executePromise)
+        return Bluebird
+            .try(() => commandModule.execute(msg, args))
             .catch(err => {
                 const logger = this.getRuntime().getLogger();
 

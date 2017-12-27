@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import ModuleRegistry from "../../util/ioc/ModuleRegistry";
 import { Logger, Message } from "botyo-api";
+import * as Bluebird from "bluebird";
 
 @injectable()
 export default class FilterChain
@@ -20,17 +21,8 @@ export default class FilterChain
 
             if (!isEnabled) continue;
 
-            // wrap in promise in case dev forgets to declare filter() as async
-            const filterPromise = new Promise((resolve, reject) => {
-                try {
-                    resolve(filterModule.filter(currentMessage))
-                } catch (err) {
-                    reject(err);
-                }
-            });
-
             try {
-                currentMessage = await filterPromise;
+                currentMessage = await Bluebird.try(() => filterModule.filter(currentMessage));
             } catch (err) {
                 this.logger.error("Filter chain broke due to an error", err);
                 break;
