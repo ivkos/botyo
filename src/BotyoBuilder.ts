@@ -45,7 +45,9 @@ export default class BotyoBuilder
 
     registerBundle(bundle: Bundle): this
     {
-        BotyoBuilder.checkClass(bundle, "Bundle", TypeUtils.isBundle);
+        if (!TypeUtils.isBundle(bundle)) {
+            throw new Error("Object must conform to the 'Bundle' interface")
+        }
 
         bundle.asyncResolvables.forEach(ar => this.registerAsyncResolvable(ar));
         bundle.modules.forEach(m => this.registerModule(m));
