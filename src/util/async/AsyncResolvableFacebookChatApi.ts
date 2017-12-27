@@ -2,20 +2,18 @@ import { ApplicationConfiguration, AsyncResolvable, ChatApi, Logger } from "boty
 import { inject, injectable, interfaces } from "inversify";
 import * as fs from "fs";
 import { FacebookChatApi } from "../../chat/FacebookChatApi";
-import { LoggerInstance } from "winston";
 import ServiceIdentifier = interfaces.ServiceIdentifier;
 
 const fbLogin = require('facebook-chat-api');
 
 @injectable()
-export default class AsyncResolvableFacebookChatApi extends AsyncResolvable<ChatApi>
+export default class AsyncResolvableFacebookChatApi implements AsyncResolvable<ChatApi>
 {
     private readonly cookiesFilePath: string;
 
     constructor(@inject(ApplicationConfiguration.SYMBOL) private readonly applicationConfiguration: ApplicationConfiguration,
-                @inject(Logger) private readonly logger: LoggerInstance)
+                @inject(Logger.SYMBOL) private readonly logger: Logger)
     {
-        super();
         this.cookiesFilePath = this.getCookiesFilePath();
     }
 

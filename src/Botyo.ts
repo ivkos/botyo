@@ -5,12 +5,13 @@ import {
     AsyncResolvable,
     ChatApi,
     CommandErrorHandlerModule,
+    Constructor,
+    Logger,
     MessageListener,
     Module
 } from "botyo-api";
 import BotyoBuilder from "./BotyoBuilder";
 import ApplicationContainer from "./util/ioc/ApplicationContainer";
-import { interfaces } from "inversify";
 import * as _ from "lodash";
 import AsyncResolvableFacebookChatApi from "./util/async/AsyncResolvableFacebookChatApi";
 import AsyncResolvableChatParticipantsResolver from "./util/async/AsyncResolvableChatParticipantsResolver";
@@ -18,25 +19,23 @@ import * as fs from "fs";
 import ChatThreadFilter from "./modules/ChatThreadFilter";
 import CommandExecutorFilter from "./modules/CommandExecutorFilter";
 import FilterChain from "./modules/util/FilterChain";
-import { LoggerInstance } from "winston";
 import LoggingUtils from "./util/logging/LoggingUtils";
 import HelpCommand from "./modules/HelpCommand";
 import * as path from "path";
 import ChatThreadParticipantsUpdaterScheduledTask from "./modules/ChatThreadParticipantsUpdaterScheduledTask";
 import TaskScheduler from "./modules/util/TaskScheduler";
-import Newable = interfaces.Newable;
 
 export default class Botyo
 {
     private applicationConfiguration: ApplicationConfiguration;
     private applicationContainer: ApplicationContainer;
-    private logger: LoggerInstance;
+    private logger: Logger;
 
     constructor(private readonly applicationConfigurationProvider: () => ApplicationConfiguration,
-                private readonly asyncResolvables: Newable<AsyncResolvable<any>>[],
-                private readonly modules: Newable<Module>[],
-                private readonly commandErrorHandler: Newable<CommandErrorHandlerModule>,
-                private readonly moduleConfigs: Map<Newable<Module>, {}>)
+                private readonly asyncResolvables: Constructor<AsyncResolvable<any>>[],
+                private readonly modules: Constructor<Module>[],
+                private readonly commandErrorHandler: Constructor<CommandErrorHandlerModule>,
+                private readonly moduleConfigs: Map<Constructor<Module>, {}>)
     {}
 
     async start(): Promise<void>

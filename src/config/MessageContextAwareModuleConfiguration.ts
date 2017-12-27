@@ -1,14 +1,7 @@
-import {
-    ApplicationConfiguration,
-    CONFIG_KEY_CHAT_THREADS,
-    CONFIG_KEY_PARTICIPANTS,
-    ModuleConfiguration,
-    ModuleConstructor
-} from "botyo-api";
+import { ApplicationConfiguration, Constants, Constructor, Module, } from "botyo-api";
 import * as _ from "lodash";
 import LodashConfiguration from "./LodashConfiguration";
-
-export const CONFIG_KEY_OVERRIDES = "overrides";
+import { AbstractModuleConfiguration } from "./AbstractModuleConfiguration";
 
 export enum ConfigurationContext
 {
@@ -16,10 +9,10 @@ export enum ConfigurationContext
     PARTICIPANT
 }
 
-export default class MessageContextAwareModuleConfiguration extends ModuleConfiguration
+export default class MessageContextAwareModuleConfiguration extends AbstractModuleConfiguration
 {
     constructor(private readonly applicationConfiguration: ApplicationConfiguration,
-                protected readonly moduleConstructor: ModuleConstructor,
+                protected readonly moduleConstructor: Constructor<Module>,
                 private readonly cfgCtx: ConfigurationContext,
                 private readonly threadId: string,
                 private readonly senderId: string)
@@ -43,7 +36,10 @@ export default class MessageContextAwareModuleConfiguration extends ModuleConfig
 
         if (this.cfgCtx === ConfigurationContext.CHAT_THREAD) {
             this.applicationConfiguration.setProperty(
-                `${CONFIG_KEY_CHAT_THREADS}.'${this.threadId}'.${CONFIG_KEY_OVERRIDES}.${path}`,
+                `${Constants.CONFIG_KEY_CHAT_THREADS}.` +
+                `'${this.threadId}'.` +
+                `${Constants.CONFIG_KEY_OVERRIDES}.` +
+                `${path}`,
                 value
             );
             return;
@@ -51,7 +47,9 @@ export default class MessageContextAwareModuleConfiguration extends ModuleConfig
 
         if (this.cfgCtx === ConfigurationContext.PARTICIPANT) {
             this.applicationConfiguration.setProperty(
-                `${CONFIG_KEY_CHAT_THREADS}.'${this.threadId}'.${CONFIG_KEY_PARTICIPANTS}.'${this.senderId}'.${CONFIG_KEY_OVERRIDES}.${path}`,
+                `${Constants.CONFIG_KEY_CHAT_THREADS}.` +
+                `'${this.threadId}'.${Constants.CONFIG_KEY_PARTICIPANTS}.` +
+                `'${this.senderId}'.${Constants.CONFIG_KEY_OVERRIDES}.${path}`,
                 value
             );
             return;
@@ -66,7 +64,11 @@ export default class MessageContextAwareModuleConfiguration extends ModuleConfig
         _.merge(
             cfgInCtxOfChatThread,
             this.applicationConfiguration.getRawObject(),
-            this.applicationConfiguration.getOrElse(`${CONFIG_KEY_CHAT_THREADS}[${this.threadId}].${CONFIG_KEY_OVERRIDES}`, {})
+            this.applicationConfiguration.getOrElse(
+                `${Constants.CONFIG_KEY_CHAT_THREADS}[${this.threadId}].` +
+                `${Constants.CONFIG_KEY_OVERRIDES}`,
+                {}
+            )
         );
 
         if (this.cfgCtx === ConfigurationContext.CHAT_THREAD) {
@@ -78,7 +80,9 @@ export default class MessageContextAwareModuleConfiguration extends ModuleConfig
                 {},
                 cfgInCtxOfChatThread,
                 this.applicationConfiguration.getOrElse(
-                    `${CONFIG_KEY_CHAT_THREADS}[${this.threadId}].${CONFIG_KEY_PARTICIPANTS}[${this.senderId}].${CONFIG_KEY_OVERRIDES}`,
+                    `${Constants.CONFIG_KEY_CHAT_THREADS}[${this.threadId}].` +
+                    `${Constants.CONFIG_KEY_PARTICIPANTS}[${this.senderId}].` +
+                    `${Constants.CONFIG_KEY_OVERRIDES}`,
                     {}
                 )
             );

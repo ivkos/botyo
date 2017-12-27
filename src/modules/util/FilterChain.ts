@@ -1,13 +1,12 @@
 import { inject, injectable } from "inversify";
 import ModuleRegistry from "../../util/ioc/ModuleRegistry";
 import { Logger, Message } from "botyo-api";
-import { LoggerInstance } from "winston";
 
 @injectable()
 export default class FilterChain
 {
     constructor(@inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry,
-                @inject(Logger) private readonly logger: LoggerInstance)
+                @inject(Logger.SYMBOL) private readonly logger: Logger)
     {}
 
     async pass(msg: Message): Promise<void>

@@ -1,16 +1,18 @@
 import {
     ApplicationConfiguration,
-    CONFIG_KEY_PARTICIPANTS,
+    Constants,
+    Constructor,
     ContextualizableModuleConfiguration,
-    ModuleConstructor
+    Module,
 } from "botyo-api";
 import * as fs from "fs";
 import * as YAML from "js-yaml";
 import * as _ from "lodash";
 import LodashConfiguration from "./LodashConfiguration";
 import ModuleConfigurationImpl from "./ModuleConfigurationImpl";
+import { AbstractConfiguration } from "./AbstractConfiguration";
 
-export default class YamlApplicationConfiguration extends ApplicationConfiguration
+export default class YamlApplicationConfiguration extends AbstractConfiguration implements ApplicationConfiguration
 {
     private readonly config: LodashConfiguration;
     private rawConfigObj: {};
@@ -44,7 +46,7 @@ export default class YamlApplicationConfiguration extends ApplicationConfigurati
         this.config.setProperty(property, value);
     }
 
-    forModule(moduleConstructor: ModuleConstructor): ContextualizableModuleConfiguration
+    forModule(moduleConstructor: Constructor<Module>): ContextualizableModuleConfiguration
     {
         return new ModuleConfigurationImpl(this, moduleConstructor);
     }
@@ -66,7 +68,7 @@ export default class YamlApplicationConfiguration extends ApplicationConfigurati
             }
 
             // skip expanding dots in vanity usernames
-            if (([CONFIG_KEY_PARTICIPANTS].includes(parentKey))) {
+            if (([Constants.CONFIG_KEY_PARTICIPANTS].includes(parentKey))) {
                 return;
             }
 

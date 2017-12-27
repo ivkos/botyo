@@ -1,20 +1,25 @@
-import { ApplicationConfiguration, AsyncResolvable, Bundle, CommandErrorHandlerModule, Module } from "botyo-api";
+import {
+    ApplicationConfiguration,
+    AsyncResolvable,
+    Bundle,
+    CommandErrorHandlerModule,
+    Constructor,
+    Module
+} from "botyo-api";
 import YamlApplicationConfiguration from "./config/YamlApplicationConfiguration";
 import Botyo from "./Botyo";
-import { interfaces } from "inversify";
 import FriendlyCommandErrorHandler from "./modules/FriendlyCommandErrorHandler";
 import TypeUtils from "./util/TypeUtils";
-import Newable = interfaces.Newable;
 
 export default class BotyoBuilder
 {
     private static readonly DEFAULT_CONFIG_FILE = "config.yaml";
 
-    private readonly asyncResolvables: Newable<AsyncResolvable<any>>[] = [];
-    private readonly modules: Newable<Module>[] = [];
-    private readonly moduleConfigs: Map<Newable<Module>, {}> = new Map();
+    private readonly asyncResolvables: Constructor<AsyncResolvable<any>>[] = [];
+    private readonly modules: Constructor<Module>[] = [];
+    private readonly moduleConfigs: Map<Constructor<Module>, {}> = new Map();
 
-    private commandErrorHandler: Newable<CommandErrorHandlerModule> = FriendlyCommandErrorHandler;
+    private commandErrorHandler: Constructor<CommandErrorHandlerModule> = FriendlyCommandErrorHandler;
 
     private applicationConfigurationProvider: () => ApplicationConfiguration =
         () => new YamlApplicationConfiguration(BotyoBuilder.DEFAULT_CONFIG_FILE);
@@ -26,9 +31,11 @@ export default class BotyoBuilder
             return this;
         }
 
-        if (!TypeUtils.likeInstanceOf(config, ApplicationConfiguration)) {
-            throw new Error(`Configuration must be the path to the configuration file ` +
-                `or an instance of ${ApplicationConfiguration.name}`);
+        if (!TypeUtils.isApplicationConfiguration(config)) {
+            throw new Error(
+                "Configuration must be the path to the configuration file or an instance of "
+                + "ApplicationConfiguration"
+            );
         }
 
         this.applicationConfigurationProvider = () => config;
@@ -38,23 +45,25 @@ export default class BotyoBuilder
 
     registerBundle(bundle: Bundle): this
     {
+        BotyoBuilder.checkClass(bundle, "Bundle", TypeUtils.isBundle);
+
         bundle.asyncResolvables.forEach(ar => this.registerAsyncResolvable(ar));
         bundle.modules.forEach(m => this.registerModule(m));
 
         return this;
     }
 
-    registerAsyncResolvable<R>(clazz: Newable<AsyncResolvable<R>>): this
+    registerAsyncResolvable<R>(clazz: Constructor<AsyncResolvable<R>>): this
     {
-        BotyoBuilder.checkClass(AsyncResolvable, clazz);
+        BotyoBuilder.checkClass(clazz, "AsyncResolvable", TypeUtils.isAsyncResolvable);
 
         this.asyncResolvables.push(clazz);
         return this;
     }
 
-    registerModule<M extends Module>(clazz: Newable<M>, config: {} = {}): this
+    registerModule<M extends Module>(clazz: Constructor<M>, config: {} = {}): this
     {
-        BotyoBuilder.checkClass(Module, clazz);
+        BotyoBuilder.checkClass(clazz, "Module", TypeUtils.isModule);
 
         this.modules.push(clazz);
         this.moduleConfigs.set(clazz, config);
@@ -62,9 +71,9 @@ export default class BotyoBuilder
         return this;
     }
 
-    registerCommandErrorHandler<M extends CommandErrorHandlerModule>(clazz: Newable<M>, config: {} = {}): this
+    registerCommandErrorHandler<M extends CommandErrorHandlerModule>(clazz: Constructor<M>, config: {} = {}): this
     {
-        BotyoBuilder.checkClass(CommandErrorHandlerModule, clazz);
+        BotyoBuilder.checkClass(clazz, "CommandErrorHandlerModule", TypeUtils.isCommandErrorHandlerModule);
 
         this.commandErrorHandler = clazz;
         this.moduleConfigs.set(clazz, config);
@@ -83,14 +92,16 @@ export default class BotyoBuilder
         );
     }
 
-    private static checkClass(parentClazz: any, clazz: any)
+    private static checkClass(clazz: any, requiredInterface: Constructor<any> | string, typeGuardFn: (it: any) => boolean)
     {
+        const requiredInterfaceName = (requiredInterface as Constructor<any>).name || requiredInterface;
+
         if (typeof clazz !== "function") {
-            throw new Error(`Argument must be a constructor of a ${parentClazz.name}`);
+            throw new Error(`Argument must be a constructor of a ${requiredInterfaceName}`);
         }
 
-        if (!TypeUtils.isClassDescendantOf(clazz, parentClazz)) {
-            throw new Error(`The specified class '${clazz.name}' must be a subtype of ${parentClazz.name}`);
+        if (!typeGuardFn(clazz)) {
+            throw new Error(`The specified class '${clazz.name}' must conform to the ${requiredInterfaceName} interface`);
         }
     }
 }

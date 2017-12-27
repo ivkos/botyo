@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import ModuleRegistry from "../../util/ioc/ModuleRegistry";
 import { Logger, ScheduledTaskModule } from "botyo-api";
-import { LoggerInstance } from "winston";
 import * as Scheduler from "node-schedule";
 import { Job } from "node-schedule";
 import * as Bluebird from "bluebird";
@@ -15,7 +14,7 @@ export default class TaskScheduler
     private readonly taskToExecutePromiseMap: Map<ScheduledTaskModule, Bluebird<any>> = new Map();
 
     constructor(@inject(ModuleRegistry) private readonly registry: ModuleRegistry,
-                @inject(Logger) private readonly logger: LoggerInstance)
+                @inject(Logger.SYMBOL) private readonly logger: Logger)
     {}
 
     start()

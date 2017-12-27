@@ -1,30 +1,28 @@
 import {
+    AbstractEmptyAsyncResolvable,
     ApplicationConfiguration,
     ChatApi,
     ChatThreadUtils,
-    CONFIG_KEY_CHAT_THREADS,
-    CONFIG_KEY_PARTICIPANTS,
     ConfigurationChatThreadsObject,
     ConfigurationParticipantsObject,
-    EmptyAsyncResolvable,
+    Constants,
     FacebookId,
     Logger
 } from "botyo-api";
 import { inject, injectable } from "inversify";
 import * as _ from "lodash";
-import { LoggerInstance } from "winston";
 import * as util from "util";
 
 const REGEX_DIGITS = /^\d+$/;
 
 @injectable()
-export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncResolvable
+export default class AsyncResolvableChatParticipantsResolver extends AbstractEmptyAsyncResolvable
 {
     private readonly vanityNameToUserIdMap: Map<string, FacebookId> = new Map();
 
     constructor(@inject(ChatApi.SYMBOL) private readonly chatApi: ChatApi,
                 @inject(ApplicationConfiguration.SYMBOL) private readonly applicationConfiguration: ApplicationConfiguration,
-                @inject(Logger) private readonly logger: LoggerInstance,
+                @inject(Logger.SYMBOL) private readonly logger: Logger,
                 @inject(ChatThreadUtils.SYMBOL) private readonly chatThreadUtils: ChatThreadUtils)
     {
         super();
@@ -87,7 +85,7 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
     async populateActualParticipants()
     {
         const chatThreadsObj =
-            this.applicationConfiguration.getProperty(CONFIG_KEY_CHAT_THREADS) as ConfigurationChatThreadsObject;
+            this.applicationConfiguration.getProperty(Constants.CONFIG_KEY_CHAT_THREADS) as ConfigurationChatThreadsObject;
 
         for (let chatThreadId of _.keys(chatThreadsObj)) {
             chatThreadsObj[chatThreadId] = chatThreadsObj[chatThreadId] || {};
@@ -107,7 +105,7 @@ export default class AsyncResolvableChatParticipantsResolver extends EmptyAsyncR
 
             chatThreadsObj[chatThreadId].name = threadInfo.threadName || undefined;
 
-            const participantsObj = _.get(chatThreadsObj[chatThreadId], CONFIG_KEY_PARTICIPANTS, {}) as
+            const participantsObj = _.get(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS, {}) as
                 ConfigurationParticipantsObject;
 
             threadInfo.participantIDs.forEach(id => {

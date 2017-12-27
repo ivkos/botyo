@@ -1,17 +1,15 @@
-import { ApplicationConfiguration, MessageContextSwitcher, ModuleConfiguration, ModuleConstructor } from "botyo-api";
+import { ApplicationConfiguration, Constructor, MessageContextSwitcher, Module, ModuleConfiguration } from "botyo-api";
 import MessageContextAwareModuleConfiguration, { ConfigurationContext } from "./MessageContextAwareModuleConfiguration";
 
-export default class MessageContextSwitcherImpl extends MessageContextSwitcher
+export default class MessageContextSwitcherImpl implements MessageContextSwitcher
 {
     private threadId: string;
     private senderId: string;
 
     constructor(private readonly applicationConfiguration: ApplicationConfiguration,
-                private readonly moduleConstructor: ModuleConstructor,
+                private readonly moduleConstructor: Constructor<Module>,
                 private readonly msg: any)
     {
-        super();
-
         this.threadId = msg.threadID;
         this.senderId = msg.senderID;
     }

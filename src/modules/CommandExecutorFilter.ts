@@ -1,23 +1,23 @@
 import {
+    AbstractFilterModule,
     CommandErrorHandlerModule,
+    Constructor,
     ContextualizableModuleConfiguration,
-    FilterModule,
     Logger,
     Message,
-    ModuleConstructor
+    Module
 } from "botyo-api";
 import ModuleRegistry from "../util/ioc/ModuleRegistry";
 import { inject } from "inversify";
-import { LoggerInstance } from "winston";
 import * as _ from "lodash";
 import HelpCommand from "./HelpCommand";
 import * as Bluebird from "bluebird";
 
-export default class CommandExecutorFilter extends FilterModule
+export default class CommandExecutorFilter extends AbstractFilterModule
 {
     constructor(@inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry,
                 @inject(CommandErrorHandlerModule.SYMBOL) private readonly errorHandler: CommandErrorHandlerModule,
-                @inject(Logger) private readonly logger: LoggerInstance)
+                @inject(Logger.SYMBOL) private readonly logger: Logger)
     {
         super();
     }
@@ -40,7 +40,7 @@ export default class CommandExecutorFilter extends FilterModule
 
         const isCommandEnabledInCtx = this.getRuntime()
             .getApplicationConfiguration()
-            .forModule(commandModule.constructor as ModuleConstructor)
+            .forModule(commandModule.constructor as Constructor<Module>)
             .inContext(msg)
             .ofParticipant()
             .isEnabled();

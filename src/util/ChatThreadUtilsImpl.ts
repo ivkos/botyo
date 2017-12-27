@@ -2,37 +2,40 @@ import {
     ApplicationConfiguration,
     ChatThreadParticipantConsumer,
     ChatThreadUtils,
-    CONFIG_KEY_CHAT_THREADS,
-    CONFIG_KEY_PARTICIPANTS,
+    Constants,
     FacebookId,
-    Logger
+    Logger,
+    Message
 } from "botyo-api";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import * as _ from "lodash";
 import * as stringSimilarity from "string-similarity";
-import { LoggerInstance } from "winston";
 
 const SIMILARITY_THRESHOLD = 0.5;
 
-export default class ChatThreadUtilsImpl extends ChatThreadUtils
+@injectable()
+export default class ChatThreadUtilsImpl implements ChatThreadUtils
 {
     constructor(@inject(ApplicationConfiguration.SYMBOL) private readonly appConfig: ApplicationConfiguration,
-                @inject(Logger) private readonly logger: LoggerInstance)
-    {
-        super();
-    }
+                @inject(Logger.SYMBOL) private readonly logger: Logger)
+    {}
 
     getChatThreadIds(): FacebookId[]
     {
-        return _.keys(this.appConfig.getProperty(CONFIG_KEY_CHAT_THREADS));
+        return _.keys(this.appConfig.getProperty(Constants.CONFIG_KEY_CHAT_THREADS));
     }
 
     getNickname(threadId: FacebookId, participantId: FacebookId): string | undefined
     {
         return this.appConfig.getOrElse(
-            `${CONFIG_KEY_CHAT_THREADS}[${threadId}].${CONFIG_KEY_PARTICIPANTS}[${participantId}].nickname`,
+            `${Constants.CONFIG_KEY_CHAT_THREADS}[${threadId}].${Constants.CONFIG_KEY_PARTICIPANTS}[${participantId}].nickname`,
             undefined
         );
+    }
+
+    getNicknameByMessage(msg: Message): string | undefined
+    {
+        return this.getNickname(msg.threadID, msg.senderID);
     }
 
     getName(userId: FacebookId): string
@@ -50,6 +53,11 @@ export default class ChatThreadUtilsImpl extends ChatThreadUtils
         return name as any as string;
     }
 
+    getNameByMessage(msg: Message): string
+    {
+        return this.getName(msg.senderID);
+    }
+
     getFirstName(userId: FacebookId): string
     {
         let firstName;
@@ -63,6 +71,11 @@ export default class ChatThreadUtilsImpl extends ChatThreadUtils
         });
 
         return firstName as any as string;
+    }
+
+    getFirstNameByMessage(msg: Message): string
+    {
+        return this.getFirstName(msg.senderID);
     }
 
     getParticipantIdByAddressee(threadId: FacebookId, addressee: string): FacebookId | undefined
@@ -122,14 +135,14 @@ export default class ChatThreadUtilsImpl extends ChatThreadUtils
 
     forEachParticipantInEachChatThread(consumer: ChatThreadParticipantConsumer): void | Promise<void>
     {
-        const chatThreadsObj = this.appConfig.getProperty(CONFIG_KEY_CHAT_THREADS);
+        const chatThreadsObj = this.appConfig.getProperty(Constants.CONFIG_KEY_CHAT_THREADS);
 
         let promises: Promise<any>[] = [];
 
         for (let chatThreadId of _.keys(chatThreadsObj)) {
             chatThreadsObj[chatThreadId] = chatThreadsObj[chatThreadId] || {};
 
-            const participantsObj = _.get(chatThreadsObj[chatThreadId], CONFIG_KEY_PARTICIPANTS, {});
+            const participantsObj = _.get(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS, {});
 
             for (let participantVanityOrId of _.keys(participantsObj)) {
                 const consumerResult = consumer(

@@ -1,7 +1,7 @@
 import * as _ from "lodash";
-import { Configuration } from "botyo-api";
+import { AbstractConfiguration } from "./AbstractConfiguration";
 
-export default class LodashConfiguration extends Configuration
+export default class LodashConfiguration extends AbstractConfiguration
 {
     constructor(private readonly rawConfigObj: {})
     {

@@ -1,6 +1,5 @@
 import { inject, injectable } from "inversify";
 import { CommandModule, FilterModule, Logger, Module, ScheduledTaskModule } from "botyo-api";
-import { LoggerInstance } from "winston";
 import TypeUtils from "../TypeUtils";
 
 @injectable()
@@ -11,7 +10,7 @@ export default class ModuleRegistry
     private readonly scheduledTaskModules: ScheduledTaskModule[] = [];
     private readonly commandToCommandModuleMap: Map<string, CommandModule> = new Map();
 
-    constructor(@inject(Logger) private readonly logger: LoggerInstance) {}
+    constructor(@inject(Logger.SYMBOL) private readonly logger: Logger) {}
 
     getCommandModules(): CommandModule[]
     {
@@ -35,8 +34,12 @@ export default class ModuleRegistry
 
     register(module: Module)
     {
-        if (TypeUtils.likeInstanceOf(module, CommandModule)) {
-            const command: string = (module as CommandModule).getCommand();
+        if (!TypeUtils.isModule(module)) {
+            throw new Error("This is not a module");
+        }
+
+        if (TypeUtils.isCommandModule(module)) {
+            const command: string = module.getCommand();
             const previouslyRegisteredCommandModule = this.commandToCommandModuleMap.get(command);
 
             if (previouslyRegisteredCommandModule !== undefined) {
@@ -44,25 +47,25 @@ export default class ModuleRegistry
                     `that is already registered by '${previouslyRegisteredCommandModule.constructor.name}'`);
             }
 
-            this.commandToCommandModuleMap.set(command, module as CommandModule);
-            this.commandModules.push(module as CommandModule);
+            this.commandToCommandModuleMap.set(command, module);
+            this.commandModules.push(module);
 
             this.logger.info(
                 `Registered module '${module.constructor.name}' ` +
-                `handling command '${(module as CommandModule).getCommand()}'`
+                `handling command '${module.getCommand()}'`
             );
             return;
         }
 
-        if (TypeUtils.likeInstanceOf(module, FilterModule)) {
-            this.filterModules.push(module as FilterModule);
+        if (TypeUtils.isFilterModule(module)) {
+            this.filterModules.push(module);
 
             this.logger.info(`Registered filter '${module.constructor.name}'`);
             return;
         }
 
-        if (TypeUtils.likeInstanceOf(module, ScheduledTaskModule)) {
-            this.scheduledTaskModules.push(module as ScheduledTaskModule);
+        if (TypeUtils.isScheduledTaskModule(module)) {
+            this.scheduledTaskModules.push(module);
 
             this.logger.info(`Registered scheduled task '${module.constructor.name}'`);
             return;

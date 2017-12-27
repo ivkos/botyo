@@ -1,9 +1,9 @@
-import { CommandModule, Message, ModuleConstructor } from "botyo-api";
+import { AbstractCommandModule, CommandModule, Constants, Constructor, Message, Module } from "botyo-api";
 import { inject } from "inversify";
 import ModuleRegistry from "../util/ioc/ModuleRegistry";
 import CommandExecutorFilter from "./CommandExecutorFilter";
 
-export default class HelpCommand extends CommandModule
+export default class HelpCommand extends AbstractCommandModule
 {
     constructor(@inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry)
     {
@@ -86,10 +86,10 @@ export default class HelpCommand extends CommandModule
 
         for (let [commandName, module] of this.moduleRegistry.getCommandToCommandModuleMap().entries()) {
             const moduleCfg = this.getRuntime()
-                .getApplicationConfiguration().forModule(module.constructor as ModuleConstructor);
+                .getApplicationConfiguration().forModule(module.constructor as Constructor<Module>);
 
             const isHidden = moduleCfg.inContext(ctx).ofParticipant()
-                .getOrElse(HelpCommand.CONFIG_KEY_HIDDEN, false);
+                .getOrElse(Constants.CONFIG_KEY_HIDDEN, false);
 
             if (isHidden) continue;
 
@@ -104,6 +104,4 @@ export default class HelpCommand extends CommandModule
         const prefixedCommand = str.split(/\s+/)[0];
         return prefixedCommand.substring(prefixedCommand.indexOf(prefix) + prefix.length);
     }
-
-    private static readonly CONFIG_KEY_HIDDEN = "hidden";
 }

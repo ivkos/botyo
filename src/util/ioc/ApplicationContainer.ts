@@ -1,16 +1,16 @@
 import { Container, decorate, injectable, interfaces } from "inversify";
 import {
+    AbstractEmptyAsyncResolvable,
+    AbstractModule,
     ApplicationConfiguration,
     AsyncResolvable,
     ChatApi,
     ChatThreadUtils,
-    Configuration,
-    EmptyAsyncResolvable,
+    Constructor,
     Logger,
     Module,
     ModuleAwareRuntime
 } from "botyo-api";
-import { LoggerInstance } from "winston";
 import LoggingUtils, { LOGGER_NAME } from "../logging/LoggingUtils";
 import * as _ from "lodash";
 import ModuleRegistry from "./ModuleRegistry";
@@ -18,7 +18,7 @@ import ChatThreadUtilsImpl from "../ChatThreadUtilsImpl";
 import FilterChain from "../../modules/util/FilterChain";
 import TaskScheduler from "../../modules/util/TaskScheduler";
 import TypeUtils from "../TypeUtils";
-import Newable = interfaces.Newable;
+import { ModuleAwareRuntimeImpl } from "../ModuleAwareRuntimeImpl";
 import ServiceIdentifier = interfaces.ServiceIdentifier;
 
 const METADATA_KEYS = require("inversify/lib/constants/metadata_keys");
@@ -32,37 +32,27 @@ export default class ApplicationContainer
         const container = new Container({ autoBindInjectable: true });
         const applicationContainer = new ApplicationContainer(container);
 
-        applicationContainer.decorateApi();
         applicationContainer.bindInternals();
+        applicationContainer.bindLogger();
 
         return applicationContainer;
     }
 
     public bindApplicationConfiguration(ac: ApplicationConfiguration)
     {
-        this.container.bind<ApplicationConfiguration>(ApplicationConfiguration).toConstantValue(ac);
         this.container.bind<ApplicationConfiguration>(ApplicationConfiguration.SYMBOL).toConstantValue(ac);
     }
 
-    public bindToSelfAndGet<M extends Module>(moduleClass: Newable<M>): M
+    public bindToSelfAndGet<M extends Module>(moduleClass: Constructor<M>): M
     {
         return this.bindAndGet(moduleClass, moduleClass);
     }
 
-    public bindAndGet<M extends Module>(serviceIdentifier: ServiceIdentifier<M>, moduleClass: Newable<M>): M
+    public bindAndGet<M extends Module>(serviceIdentifier: ServiceIdentifier<M>, moduleClass: Constructor<M>): M
     {
-        moduleClass.prototype.runtime = new ModuleAwareRuntime(
-            moduleClass,
-            this.container.get(ChatApi.SYMBOL),
-            this.container.get(ApplicationConfiguration.SYMBOL),
-            this.container.getTagged(Logger, LOGGER_NAME, moduleClass.name),
-            this.container.get(ChatThreadUtils.SYMBOL)
-        );
+        this.decorateRoot(moduleClass, AbstractModule);
 
-        const theirRootModuleClass = TypeUtils.getPrototypeChain(moduleClass).find(c => c.name === Module.name);
-        if (!Reflect.hasOwnMetadata(METADATA_KEYS.PARAM_TYPES, theirRootModuleClass as Function)) {
-            decorate(injectable(), theirRootModuleClass);
-        }
+        moduleClass.prototype.runtime = this.createModuleAwareRuntime(moduleClass);
 
         this.container.bind<M>(serviceIdentifier).to(moduleClass).inSingletonScope();
         const module = this.container.get(serviceIdentifier);
@@ -72,15 +62,9 @@ export default class ApplicationContainer
         return module;
     }
 
-    public async bindAndResolveAsyncResolvable<R>(arClass: Newable<AsyncResolvable<R>>): Promise<void>
+    public async bindAndResolveAsyncResolvable<R>(arClass: Constructor<AsyncResolvable<R>>): Promise<void>
     {
-        const theirRootAsyncResolvableClass = TypeUtils
-            .getPrototypeChain(arClass)
-            .find(c => c.name === AsyncResolvable.name);
-
-        if (!Reflect.hasOwnMetadata(METADATA_KEYS.PARAM_TYPES, theirRootAsyncResolvableClass as Function)) {
-            decorate(injectable(), theirRootAsyncResolvableClass);
-        }
+        this.decorateRoot(arClass);
 
         this.container.bind<AsyncResolvable<R>>(arClass).toSelf().inSingletonScope();
 
@@ -88,8 +72,8 @@ export default class ApplicationContainer
         const result = await resolvable.resolve();
 
         if (result === undefined ||
-            resolvable.getServiceIdentifier() === EmptyAsyncResolvable.EMPTY_IDENTIFIER ||
-            TypeUtils.likeInstanceOf(resolvable, EmptyAsyncResolvable)) {
+            resolvable.getServiceIdentifier() === AbstractEmptyAsyncResolvable.EMPTY_IDENTIFIER ||
+            TypeUtils.likeInstanceOf(resolvable, AbstractEmptyAsyncResolvable)) {
             return;
         }
 
@@ -101,17 +85,47 @@ export default class ApplicationContainer
         return this.container;
     }
 
-    private bindInternals()
+    private createModuleAwareRuntime<M extends Module>(moduleClass: Constructor<M>): ModuleAwareRuntime
+    {
+        return new ModuleAwareRuntimeImpl(
+            moduleClass,
+            this.container.get(ChatApi.SYMBOL),
+            this.container.get(ApplicationConfiguration.SYMBOL),
+            this.container.getTagged(Logger.SYMBOL, LOGGER_NAME, moduleClass.name),
+            this.container.get(ChatThreadUtils.SYMBOL)
+        )
+    }
+
+    private decorateRoot<T, R>(clazz: Constructor<T>, root?: Constructor<R>): void
+    {
+        const protoChain = TypeUtils.getPrototypeChain(clazz);
+
+        let rootOfClazz = root ? protoChain.find(c => c.name === root.name) : undefined;
+        if (!rootOfClazz) {
+            const idx = protoChain.map(c => c.name).lastIndexOf("");
+            rootOfClazz = protoChain[idx - 1];
+        }
+
+        if (rootOfClazz === undefined) {
+            throw new Error("Illegal state: Root of class not found");
+        }
+
+        if (!Reflect.hasOwnMetadata(METADATA_KEYS.PARAM_TYPES, rootOfClazz as Function)) {
+            decorate(injectable(), rootOfClazz);
+        }
+    }
+
+    private bindInternals(): void
     {
         this.container.bind<FilterChain>(FilterChain).toSelf().inSingletonScope();
         this.container.bind<TaskScheduler>(TaskScheduler).toSelf().inSingletonScope();
-
-        this.container.bind<ChatThreadUtils>(ChatThreadUtils).to(ChatThreadUtilsImpl).inSingletonScope();
-        this.container.bind<ChatThreadUtils>(ChatThreadUtils.SYMBOL).to(ChatThreadUtilsImpl).inSingletonScope();
-
         this.container.bind<ModuleRegistry>(ModuleRegistry).toSelf().inSingletonScope();
+        this.container.bind<ChatThreadUtils>(ChatThreadUtils.SYMBOL).to(ChatThreadUtilsImpl).inSingletonScope();
+    }
 
-        this.container.bind<LoggerInstance>(Logger).toDynamicValue(ctx => {
+    private bindLogger(): void
+    {
+        this.container.bind<Logger>(Logger.SYMBOL).toDynamicValue(ctx => {
             let loggerName;
 
             const tags = ctx.plan.rootRequest.target.getCustomTags();
@@ -128,16 +142,6 @@ export default class ApplicationContainer
             }
 
             return LoggingUtils.createLogger(loggerName);
-        }).onActivation((context, injectable) => {
-            return injectable;
         });
-    }
-
-    private decorateApi()
-    {
-        decorate(injectable(), AsyncResolvable);
-        decorate(injectable(), ChatThreadUtils);
-        decorate(injectable(), Configuration);
-        decorate(injectable(), Module);
     }
 }

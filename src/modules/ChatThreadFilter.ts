@@ -1,11 +1,10 @@
-import { ApplicationConfiguration, CONFIG_KEY_CHAT_THREADS, FilterModule, Logger, Message } from "botyo-api";
+import { AbstractFilterModule, ApplicationConfiguration, Constants, Logger, Message } from "botyo-api";
 import { inject } from "inversify";
-import { LoggerInstance } from "winston";
 
-export default class ChatThreadFilter extends FilterModule
+export default class ChatThreadFilter extends AbstractFilterModule
 {
     constructor(@inject(ApplicationConfiguration.SYMBOL) private readonly applicationConfiguration: ApplicationConfiguration,
-                @inject(Logger) private readonly logger: LoggerInstance)
+                @inject(Logger.SYMBOL) private readonly logger: Logger)
     {
         super();
     }
@@ -14,8 +13,9 @@ export default class ChatThreadFilter extends FilterModule
     {
         const threadID = msg.threadID;
 
-        const chatThreadsObj = this.applicationConfiguration.getOrElse(`${CONFIG_KEY_CHAT_THREADS}[${threadID}]`, undefined);
-        const shouldListen = chatThreadsObj !== undefined;
+        const shouldListen = this.applicationConfiguration.hasProperty(
+            `${Constants.CONFIG_KEY_CHAT_THREADS}[${threadID}]`
+        );
 
         if (!shouldListen) {
             this.logger.info(`Received a message from a chat thread (https://m.me/${threadID}) we are not listening to`);
@@ -24,5 +24,4 @@ export default class ChatThreadFilter extends FilterModule
 
         return msg;
     }
-
 }

@@ -1,8 +1,8 @@
-import { ScheduledTaskModule } from "botyo-api";
+import { AbstractScheduledTaskModule, Constants } from "botyo-api";
 import { inject } from "inversify";
 import AsyncResolvableChatParticipantsResolver from "../util/async/AsyncResolvableChatParticipantsResolver";
 
-export default class ChatThreadParticipantsUpdaterScheduledTask extends ScheduledTaskModule
+export default class ChatThreadParticipantsUpdaterScheduledTask extends AbstractScheduledTaskModule
 {
     constructor(@inject(AsyncResolvableChatParticipantsResolver) private readonly resolver: AsyncResolvableChatParticipantsResolver)
     {
@@ -23,7 +23,7 @@ export default class ChatThreadParticipantsUpdaterScheduledTask extends Schedule
     getSchedule(): string | number
     {
         return this.getRuntime().getConfiguration().getOrElse(
-            ScheduledTaskModule.CONFIG_KEY_SCHEDULE,
+            Constants.CONFIG_KEY_SCHEDULE,
             ChatThreadParticipantsUpdaterScheduledTask.DEFAULT_INTERVAL
         );
     }

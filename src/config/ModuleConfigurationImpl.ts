@@ -1,15 +1,20 @@
 import {
     ApplicationConfiguration,
+    Constructor,
     ContextualizableModuleConfiguration,
+    FacebookId,
     MessageContextSwitcher,
-    ModuleConstructor
+    Module,
+    ModuleConfiguration
 } from "botyo-api";
 import MessageContextSwitcherImpl from "./MessageContextSwitcherImpl";
+import { AbstractModuleConfiguration } from "./AbstractModuleConfiguration";
 
-export default class ModuleConfigurationImpl extends ContextualizableModuleConfiguration
+export default class ModuleConfigurationImpl
+    extends AbstractModuleConfiguration implements ContextualizableModuleConfiguration
 {
     constructor(private readonly applicationConfiguration: ApplicationConfiguration,
-                protected readonly moduleConstructor: ModuleConstructor)
+                protected readonly moduleConstructor: Constructor<Module>)
     {
         super();
     }
@@ -32,6 +37,11 @@ export default class ModuleConfigurationImpl extends ContextualizableModuleConfi
     inContext(messageContext: {}): MessageContextSwitcher
     {
         return new MessageContextSwitcherImpl(this.applicationConfiguration, this.moduleConstructor, messageContext);
+    }
+
+    inContextOfChatThread(chatThreadId: FacebookId): ModuleConfiguration
+    {
+        return this.inContext({ threadID: chatThreadId }).ofChatThread();
     }
 
     getRawObject(): {}

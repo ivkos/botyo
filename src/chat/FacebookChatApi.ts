@@ -13,15 +13,12 @@ import {
 } from "botyo-api";
 
 
-export class FacebookChatApi extends ChatApi implements MessageListener
+export class FacebookChatApi implements ChatApi, MessageListener
 {
     private readonly facebookChatApiFnToPromisifiedFnMap: WeakMap<(...args: any[]) => any,
         (...args: any[]) => Promise<any>> = new WeakMap();
 
-    constructor(private readonly facebookChatApi: any)
-    {
-        super();
-    }
+    constructor(private readonly facebookChatApi: any) {}
 
     listen(handler: MessageHandler): void
     {

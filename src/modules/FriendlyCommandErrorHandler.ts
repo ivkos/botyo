@@ -1,6 +1,6 @@
-import { CommandErrorHandlerModule, CommandModule, Message } from "botyo-api";
+import { AbstractCommandErrorHandlerModule, CommandModule, Message } from "botyo-api";
 
-export default class FriendlyCommandErrorHandler extends CommandErrorHandlerModule
+export default class FriendlyCommandErrorHandler extends AbstractCommandErrorHandlerModule
 {
     async handle(err: Error, message: Message, commandModule: CommandModule): Promise<void>
     {
