@@ -11,6 +11,7 @@ import {
     UserIdSearchResult,
     UserInfoResult
 } from "botyo-api";
+import FacebookLoginHelper from "../util/FacebookLoginHelper";
 
 
 export class FacebookChatApi implements ChatApi, MessageListener
@@ -18,7 +19,9 @@ export class FacebookChatApi implements ChatApi, MessageListener
     private readonly facebookChatApiFnToPromisifiedFnMap: WeakMap<(...args: any[]) => any,
         (...args: any[]) => Promise<any>> = new WeakMap();
 
-    constructor(private readonly facebookChatApi: any) {}
+    private loginPromise?: Bluebird<ChatApi>;
+
+    constructor(private facebookChatApi: any, private readonly facebookLoginHelper: FacebookLoginHelper) {}
 
     listen(handler: MessageHandler): void
     {
@@ -27,22 +30,22 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     async sendMessage(threadId: FacebookId, message: Message | string): Promise<Message>
     {
-        return this.cachify(this.facebookChatApi.sendMessage)(message, threadId);
+        return this.wrap(this.facebookChatApi.sendMessage)(message, threadId);
     }
 
     async changeThreadColor(threadId: FacebookId, color: string): Promise<void>
     {
-        return this.cachify(this.facebookChatApi.changeThreadColor)(color, threadId);
+        return this.wrap(this.facebookChatApi.changeThreadColor)(color, threadId);
     }
 
     async getThreadInfo(threadId: FacebookId): Promise<ThreadInfo>
     {
-        return this.cachify(this.facebookChatApi.getThreadInfoGraphQL)(threadId);
+        return this.wrap(this.facebookChatApi.getThreadInfoGraphQL)(threadId);
     }
 
     async getThreadHistory(threadId: FacebookId, amount: number, timestamp?: number): Promise<Message[]>
     {
-        return this.cachify(this.facebookChatApi.getThreadHistoryGraphQL)(threadId, amount, timestamp);
+        return this.wrap(this.facebookChatApi.getThreadHistoryGraphQL)(threadId, amount, timestamp);
     }
 
     async sendTypingIndicator(threadId: FacebookId): Promise<EndTypingIndicatorFunction>
@@ -68,17 +71,17 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     async markAsRead(threadId: FacebookId): Promise<void>
     {
-        return this.cachify(this.facebookChatApi.markAsRead)(threadId);
+        return this.wrap(this.facebookChatApi.markAsRead)(threadId);
     }
 
     async getUserInfo(ids: FacebookId | FacebookId[]): Promise<UserInfoResult>
     {
-        return this.cachify(this.facebookChatApi.getUserInfo)(ids);
+        return this.wrap(this.facebookChatApi.getUserInfo)(ids);
     }
 
     async getUserId(name: string): Promise<UserIdSearchResult[]>
     {
-        return this.cachify(this.facebookChatApi.getUserID)(name);
+        return this.wrap(this.facebookChatApi.getUserID)(name);
     }
 
     getCurrentUserId(): FacebookId
@@ -88,17 +91,58 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     async handleMessageRequest(threadId: FacebookId, shouldAccept: boolean): Promise<void>
     {
-        return this.cachify(this.facebookChatApi.handleMessageRequest)(threadId, shouldAccept);
+        return this.wrap(this.facebookChatApi.handleMessageRequest)(threadId, shouldAccept);
     }
 
     async setMessageReaction(messageId: FacebookId, reaction: Reaction | string): Promise<void>
     {
-        return this.cachify(this.facebookChatApi.setMessageReaction)(reaction, messageId);
+        return this.wrap(this.facebookChatApi.setMessageReaction)(reaction, messageId);
     }
 
     async resolvePhotoUrl(photoId: FacebookId): Promise<string>
     {
-        return this.cachify(this.facebookChatApi.resolvePhotoUrl)(photoId);
+        return this.wrap(this.facebookChatApi.resolvePhotoUrl)(photoId);
+    }
+
+    private wrap(fn: (...args: any[]) => any): (...args: any[]) => Promise<any>
+    {
+        return this.attachReloginErrorHandler(this.cachify(fn));
+    }
+
+    /**
+     * Handles the "errorSummary=Sorry, something went wrong, errorDescription=Please try closing and re-opening
+     * your browser window." error that persists after the bot has been logged in for a long period of time
+     */
+    private attachReloginErrorHandler(fn: (...args: any[]) => Promise<any>): (...args: any[]) => Promise<any>
+    {
+        const self = this;
+
+        return {
+            [fn.name || "fn"]: function () {
+                const args = arguments;
+
+                return fn.apply(self, args).catch((err: any) => {
+                    if (err.error == 1357004) {
+                        if (!self.loginPromise) {
+                            self.loginPromise = Bluebird.resolve(self.facebookLoginHelper.login());
+                        }
+
+                        const promise = self.loginPromise.then((api: ChatApi) => {
+                            self.facebookChatApi = api;
+                            return fn.apply(self, args);
+                        });
+
+                        promise.finally(() => {
+                            self.loginPromise = undefined;
+                        });
+
+                        return promise;
+                    }
+
+                    throw err;
+                });
+            }
+        }[fn.name || "fn"];
     }
 
     private cachify(fn: (...args: any[]) => any): (...args: any[]) => Promise<any>
