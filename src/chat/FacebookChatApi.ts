@@ -20,11 +20,13 @@ export class FacebookChatApi implements ChatApi, MessageListener
         (...args: any[]) => Promise<any>> = new WeakMap();
 
     private loginPromise?: Bluebird<ChatApi>;
+    private handler?: MessageHandler;
 
     constructor(private facebookChatApi: any, private readonly facebookLoginHelper: FacebookLoginHelper) {}
 
     listen(handler: MessageHandler): void
     {
+        this.handler = handler;
         this.facebookChatApi.listen(handler);
     }
 
@@ -50,16 +52,19 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     async sendTypingIndicator(threadId: FacebookId): Promise<EndTypingIndicatorFunction>
     {
-        return new Promise<EndTypingIndicatorFunction>((resolve, reject) => {
-            const endFn: (err: any) => void =
-                this.facebookChatApi.sendTypingIndicator(threadId, (err: any) => {
-                    if (err) return reject(err);
-                    return resolve(this.makeEndTypingIndicatorFunction(endFn));
-                });
+        let endFn: (cb: (err: any) => void) => void = (fn: Function) => { fn(); };
+
+        await new Promise<any>((resolve, reject) => {
+            endFn = this.facebookChatApi.sendTypingIndicator(threadId, (err: any) => {
+                if (err) return reject(err);
+                return resolve();
+            })
         });
+
+        return this.makeEndTypingIndicatorFunction(endFn);
     }
 
-    private makeEndTypingIndicatorFunction(originalEndFn: (err: any) => void): EndTypingIndicatorFunction
+    private makeEndTypingIndicatorFunction(originalEndFn: (cb: (err: any) => void) => void): EndTypingIndicatorFunction
     {
         return () => new Promise<void>((resolve, reject) => {
             originalEndFn((err: any) => {
@@ -124,17 +129,22 @@ export class FacebookChatApi implements ChatApi, MessageListener
                 return fn.apply(self, args).catch((err: any) => {
                     if (err.error == 1357004) {
                         if (!self.loginPromise) {
+                            self.facebookChatApi.logout(() => {});
+
                             self.loginPromise = Bluebird.resolve(self.facebookLoginHelper.login());
+
+                            self.loginPromise.then((api: ChatApi) => {
+                                self.facebookChatApi = api;
+
+                                if (self.handler) {
+                                    self.listen(self.handler);
+                                }
+                            });
                         }
 
-                        const promise = self.loginPromise.then((api: ChatApi) => {
-                            self.facebookChatApi = api;
-                            return fn.apply(self, args);
-                        });
+                        const promise = self.loginPromise.then(() => fn.apply(self, args));
 
-                        promise.finally(() => {
-                            self.loginPromise = undefined;
-                        });
+                        self.loginPromise.finally(() => { self.loginPromise = undefined });
 
                         return promise;
                     }
