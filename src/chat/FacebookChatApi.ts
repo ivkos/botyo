@@ -16,8 +16,8 @@ import FacebookLoginHelper from "../util/FacebookLoginHelper";
 
 export class FacebookChatApi implements ChatApi, MessageListener
 {
-    private readonly facebookChatApiFnToPromisifiedFnMap: WeakMap<(...args: any[]) => any,
-        (...args: any[]) => Promise<any>> = new WeakMap();
+    private readonly facebookChatApiFnToPromisifiedFnMap: Map<(...args: any[]) => any,
+        (...args: any[]) => Promise<any>> = new Map();
 
     private loginPromise?: Bluebird<ChatApi>;
     private handler?: MessageHandler;
@@ -133,8 +133,9 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
                             self.loginPromise = Bluebird.resolve(self.facebookLoginHelper.login());
 
-                            self.loginPromise.then((api: ChatApi) => {
-                                self.facebookChatApi = api;
+                            self.loginPromise.then((api: FacebookChatApi) => {
+                                self.facebookChatApi = api.facebookChatApi;
+                                self.facebookChatApiFnToPromisifiedFnMap.clear();
 
                                 if (self.handler) {
                                     self.listen(self.handler);
