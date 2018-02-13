@@ -7,6 +7,7 @@ import {
     MessageHandler,
     MessageListener,
     Reaction,
+    StopListeningFunction,
     ThreadInfo,
     UserIdSearchResult,
     UserInfoResult
@@ -24,10 +25,10 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     constructor(private facebookChatApi: any, private readonly facebookLoginHelper: FacebookLoginHelper) {}
 
-    listen(handler: MessageHandler): void
+    listen(handler: MessageHandler): StopListeningFunction
     {
         this.handler = handler;
-        this.facebookChatApi.listen(handler);
+        return this.facebookChatApi.listen(handler);
     }
 
     async sendMessage(threadId: FacebookId, message: Message | string): Promise<Message>
