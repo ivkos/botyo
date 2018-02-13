@@ -3,6 +3,7 @@ import {
     ChatApi,
     EndTypingIndicatorFunction,
     FacebookId,
+    Logger,
     Message,
     MessageHandler,
     MessageListener,
@@ -13,6 +14,7 @@ import {
     UserInfoResult
 } from "botyo-api";
 import FacebookLoginHelper from "../util/FacebookLoginHelper";
+import LoggingUtils from "../util/logging/LoggingUtils";
 
 
 export class FacebookChatApi implements ChatApi, MessageListener
@@ -22,13 +24,15 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     private loginPromise?: Bluebird<ChatApi>;
     private handler?: MessageHandler;
+    private stopListeningFn?: StopListeningFunction;
+    private readonly logger: Logger = LoggingUtils.createLogger(FacebookChatApi.name);
 
     constructor(private facebookChatApi: any, private readonly facebookLoginHelper: FacebookLoginHelper) {}
 
     listen(handler: MessageHandler): StopListeningFunction
     {
         this.handler = handler;
-        return this.facebookChatApi.listen(handler);
+        return (this.stopListeningFn = this.facebookChatApi.listen(handler));
     }
 
     async sendMessage(threadId: FacebookId, message: Message | string): Promise<Message>
@@ -129,8 +133,23 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
                 return fn.apply(self, args).catch((err: any) => {
                     if (err.error == 1357004) {
+                        self.logger.warn("Caught error that requires relogin. Recovering...");
+
                         if (!self.loginPromise) {
-                            self.facebookChatApi.logout(() => {});
+                            if (self.stopListeningFn && typeof self.stopListeningFn === "function") {
+                                self.stopListeningFn();
+                                self.logger.info("Stopped listening on old facebook-chat-api instance");
+                            } else {
+                                self.logger.error(
+                                    "Could not stop listening on old facebook-chat-api instance. " +
+                                    "This may cause messages to be handled more than once"
+                                );
+                            }
+
+                            self.facebookChatApi.logout((err: any) => {
+                                if (err) return self.logger.warn("Logout failed on old facebook-chat-api instance", err);
+                                return self.logger.info("Logged out successfully on old facebook-chat-api instance");
+                            });
 
                             self.loginPromise = Bluebird.resolve(self.facebookLoginHelper.login());
 
