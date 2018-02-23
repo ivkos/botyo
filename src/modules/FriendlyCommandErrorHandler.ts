@@ -6,9 +6,11 @@ export default class FriendlyCommandErrorHandler extends AbstractCommandErrorHan
     {
         const firstName = this.getRuntime().getChatThreadUtils().getFirstNameByMessage(message);
 
+        const sorryText = firstName ? `Sorry, ${firstName}` : "Sorry";
+
         return this.getRuntime().getChatApi().sendMessage(
             message.threadID,
-            `Sorry, ${firstName}. Something went wrong. :/`
+            `${sorryText}. Something went wrong. :/`
         );
     }
 }
