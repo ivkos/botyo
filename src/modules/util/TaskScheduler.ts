@@ -78,12 +78,14 @@ export default class TaskScheduler
             return;
         }
 
-        const executePromise = Bluebird.resolve(module.execute());
+        const executePromise = Bluebird.try(() => module.execute());
         this.taskToExecutePromiseMap.set(module, executePromise);
+
+        this.logger.info(`Scheduled task '${taskName}' started`);
 
         return executePromise
             .then(() => {
-                this.logger.info(`Scheduled task '${taskName}' finished successfully`)
+                this.logger.info(`Scheduled task '${taskName}' finished`)
             })
             .catch(err => {
                 this.logger.error(`Scheduled task '${taskName}' failed`, err);
