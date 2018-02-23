@@ -103,7 +103,7 @@ export default class CommandExecutorFilter extends AbstractFilterModule
     {
         return cfg
             .inContext(ctx)
-            .ofParticipant()
+            .ofChatThread()
             .getOrElse(
                 CommandExecutorFilter.CONFIG_KEY_PREFIX,
                 CommandExecutorFilter.DEFAULT_PREFIX
