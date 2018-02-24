@@ -8,7 +8,8 @@ import {
     Constants,
     FacebookId,
     Logger,
-    UserIdSearchResult
+    UserIdSearchResult,
+    UserInfoObject
 } from "botyo-api";
 import { inject, injectable } from "inversify";
 import * as _ from "lodash";
@@ -124,7 +125,9 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
 
             if (threadInfo.nicknames) {
                 for (let [id, nickname] of _.toPairs(threadInfo.nicknames)) {
-                    participantsObj[id].nickname = nickname;
+                    if (participantsObj[id]) {
+                        participantsObj[id].nickname = nickname;
+                    }
                 }
             }
         }
@@ -156,6 +159,12 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
                 return;
             }
 
+            if (AsyncResolvableChatParticipantsResolver.isAccountInactive(resultForUser)) {
+                this.logger.warn(`Account 'https://www.facebook.com/${participantId}' appears to be inactive`);
+                delete participantsObj[participantId];
+                return;
+            }
+
             participantObj.name = resultForUser.name;
             participantObj.firstName = resultForUser.firstName;
             participantObj.id = participantId;
@@ -168,5 +177,20 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
                 participantsObj[resultForUser.vanity] = participantObj;
             }
         });
+    }
+
+    private static isAccountInactive(u: UserInfoObject): boolean
+    {
+        // most inactive accounts have this reserved name,
+        // but some still have their real name, so additional checks need to be done
+        if (u.name === "Facebook User" && u.firstName === "Facebook User") return true;
+
+        // gender 7 apparently means account is inactive
+        if (u.gender === 7) return true;
+
+        // ALL inactive accounts are returned with no vanity AND no profileUrl
+        if (!u.vanity && !u.profileUrl) return true;
+
+        return false;
     }
 }
