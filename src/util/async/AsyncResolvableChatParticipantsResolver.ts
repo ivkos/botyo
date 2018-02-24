@@ -7,7 +7,8 @@ import {
     ConfigurationParticipantsObject,
     Constants,
     FacebookId,
-    Logger
+    Logger,
+    UserIdSearchResult
 } from "botyo-api";
 import { inject, injectable } from "inversify";
 import * as _ from "lodash";
@@ -37,6 +38,8 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
 
     async resolveDeclaredVanityNamesToIds()
     {
+        const vanityToGetUserIdPromiseMap = new Map<string, Promise<UserIdSearchResult[]>>();
+
         return this.chatThreadUtils.forEachParticipantInEachChatThread(async (chatThreadId,
                                                                               participantVanityOrId,
                                                                               participantObj,
@@ -48,8 +51,13 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
 
             let userId = this.vanityNameToUserIdMap.get(participantVanityOrId as string);
             if (userId === undefined) {
-                const results = (await this.chatApi.getUserId(participantVanityOrId as string))
-                    .filter(r => r.type === "user");
+                let getUserIdPromise = vanityToGetUserIdPromiseMap.get(participantVanityOrId as string);
+                if (getUserIdPromise === undefined) {
+                    getUserIdPromise = this.chatApi.getUserId(participantVanityOrId as string);
+                    vanityToGetUserIdPromiseMap.set(participantVanityOrId as string, getUserIdPromise);
+                }
+
+                const results = (await getUserIdPromise).filter(r => r.type === "user");
 
                 if (results.length === 0) {
                     this.logger.warn(`Could not find a user with vanity name '${participantVanityOrId}'. ` +
