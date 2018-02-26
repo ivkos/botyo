@@ -93,6 +93,10 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
 
     async populateActualParticipants()
     {
+        if (!this.applicationConfiguration.hasProperty(Constants.CONFIG_KEY_CHAT_THREADS)) {
+            this.applicationConfiguration.setProperty(Constants.CONFIG_KEY_CHAT_THREADS, {});
+        }
+
         const chatThreadsObj =
             this.applicationConfiguration.getProperty(Constants.CONFIG_KEY_CHAT_THREADS) as ConfigurationChatThreadsObject;
 
@@ -114,7 +118,11 @@ export default class AsyncResolvableChatParticipantsResolver extends AbstractEmp
 
             chatThreadsObj[chatThreadId].name = threadInfo.threadName || undefined;
 
-            const participantsObj = _.get(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS, {}) as
+            if (!_.has(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS)) {
+                _.set(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS, {});
+            }
+
+            const participantsObj = _.get(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS) as
                 ConfigurationParticipantsObject;
 
             threadInfo.participantIDs.forEach(id => {

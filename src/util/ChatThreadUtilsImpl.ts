@@ -135,6 +135,10 @@ export default class ChatThreadUtilsImpl implements ChatThreadUtils
 
     forEachParticipantInEachChatThread(consumer: ChatThreadParticipantConsumer): void | Promise<void>
     {
+        if (!this.appConfig.hasProperty(Constants.CONFIG_KEY_CHAT_THREADS)) {
+            this.appConfig.setProperty(Constants.CONFIG_KEY_CHAT_THREADS, {})
+        }
+
         const chatThreadsObj = this.appConfig.getProperty(Constants.CONFIG_KEY_CHAT_THREADS);
 
         let promises: Promise<any>[] = [];
@@ -142,7 +146,11 @@ export default class ChatThreadUtilsImpl implements ChatThreadUtils
         for (let chatThreadId of _.keys(chatThreadsObj)) {
             chatThreadsObj[chatThreadId] = chatThreadsObj[chatThreadId] || {};
 
-            const participantsObj = _.get(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS, {});
+            if (!_.has(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS)) {
+                _.set(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS, {});
+            }
+
+            const participantsObj = _.get(chatThreadsObj[chatThreadId], Constants.CONFIG_KEY_PARTICIPANTS);
 
             for (let participantVanityOrId of _.keys(participantsObj)) {
                 const consumerResult = consumer(
