@@ -75,7 +75,8 @@ export default class CommandExecutorFilter extends AbstractFilterModule
             .catch(err => {
                 const logger = this.getRuntime().getLogger();
 
-                this.errorHandler.handle(err, msg, commandModule)
+                Bluebird
+                    .try(() => this.errorHandler.handle(err, msg, commandModule))
                     .catch(err => {
                         logger.error(`Error in ${this.errorHandler.constructor.name}::handle(...)`, err);
                     });
