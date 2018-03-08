@@ -1,6 +1,7 @@
 import { inject, injectable } from "inversify";
 import { CommandModule, FilterModule, Logger, Module, ScheduledTaskModule } from "botyo-api";
 import TypeUtils from "../TypeUtils";
+import * as _ from "lodash";
 
 @injectable()
 export default class ModuleRegistry
@@ -32,14 +33,58 @@ export default class ModuleRegistry
         return this.scheduledTaskModules;
     }
 
-    register(module: Module)
+    register(module: Module): void
     {
         if (!TypeUtils.isModule(module)) {
             throw new Error("This is not a module");
         }
 
         if (TypeUtils.isCommandModule(module)) {
-            const command: string = module.getCommand();
+            return this.registerCommandModule(module);
+        }
+
+        if (TypeUtils.isFilterModule(module)) {
+            return this.registerFilterModule(module);
+        }
+
+        if (TypeUtils.isScheduledTaskModule(module)) {
+            return this.registerScheduledTaskModule(module);
+        }
+    }
+
+    private registerScheduledTaskModule(module: ScheduledTaskModule): void
+    {
+        this.scheduledTaskModules.push(module);
+        this.logger.info(`Registered scheduled task module '${module.constructor.name}'`);
+    }
+
+    private registerFilterModule(module: FilterModule): void
+    {
+        this.filterModules.push(module);
+        this.logger.info(`Registered filter module '${module.constructor.name}'`);
+    }
+
+    private registerCommandModule(module: CommandModule): void
+    {
+        let commands: string | string[] = module.getCommand();
+
+        if (!_.isString(commands) && !_.isArray(commands)) {
+            throw new Error(`${module.constructor.name}::${module.getCommand.name}() must return a string or an array of strings`);
+        }
+
+        if (_.isArray(commands) && commands.length === 0) {
+            throw new Error(`${module.constructor.name}::${module.getCommand.name}() must not return an empty array`);
+        }
+
+        if (!_.isArray(commands)) {
+            commands = [commands];
+        }
+
+        for (let command of commands) {
+            if (!ModuleRegistry.isValidCommand(command)) {
+                throw new Error(`Module '${module.constructor.name}' is trying to handle invalid command '${command}'`);
+            }
+
             const previouslyRegisteredCommandModule = this.commandToCommandModuleMap.get(command);
 
             if (previouslyRegisteredCommandModule !== undefined) {
@@ -48,27 +93,23 @@ export default class ModuleRegistry
             }
 
             this.commandToCommandModuleMap.set(command, module);
-            this.commandModules.push(module);
-
-            this.logger.info(
-                `Registered module '${module.constructor.name}' ` +
-                `handling command '${module.getCommand()}'`
-            );
-            return;
         }
 
-        if (TypeUtils.isFilterModule(module)) {
-            this.filterModules.push(module);
+        this.commandModules.push(module);
 
-            this.logger.info(`Registered filter '${module.constructor.name}'`);
-            return;
-        }
+        this.logger.info(
+            `Registered command module '${module.constructor.name}' ` +
+            `handling command${commands.length > 1 ? 's' : ''}: ${commands.join(', ')}`
+        );
+    }
 
-        if (TypeUtils.isScheduledTaskModule(module)) {
-            this.scheduledTaskModules.push(module);
+    private static isValidCommand(command: string): boolean
+    {
+        if (!command) return false;
+        if (!_.isString(command)) return false;
+        if (command.length === 0) return false;
+        if (command.includes(' ')) return false;
 
-            this.logger.info(`Registered scheduled task '${module.constructor.name}'`);
-            return;
-        }
+        return true;
     }
 }
