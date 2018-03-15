@@ -146,11 +146,6 @@ export class FacebookChatApi implements ChatApi, MessageListener
                                 );
                             }
 
-                            self.facebookChatApi.logout((err: any) => {
-                                if (err) return self.logger.warn("Logout failed on old facebook-chat-api instance", err);
-                                return self.logger.info("Logged out successfully on old facebook-chat-api instance");
-                            });
-
                             self.loginPromise = Bluebird.resolve(self.facebookLoginHelper.login());
 
                             self.loginPromise.then((api: FacebookChatApi) => {
