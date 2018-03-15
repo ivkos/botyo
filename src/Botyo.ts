@@ -8,7 +8,8 @@ import {
     Constructor,
     Logger,
     MessageListener,
-    Module
+    Module,
+    StopListeningFunction
 } from "botyo-api";
 import BotyoBuilder from "./BotyoBuilder";
 import ApplicationContainer from "./util/ioc/ApplicationContainer";
@@ -24,11 +25,18 @@ import HelpCommand from "./modules/HelpCommand";
 import * as path from "path";
 import ChatThreadParticipantsUpdaterScheduledTask from "./modules/ChatThreadParticipantsUpdaterScheduledTask";
 import TaskScheduler from "./modules/util/TaskScheduler";
+import ModuleRegistry from "./util/ioc/ModuleRegistry";
+import * as Bluebird from "bluebird";
+import { Container } from "inversify";
 
 export default class Botyo
 {
     private applicationConfiguration: ApplicationConfiguration;
     private applicationContainer: ApplicationContainer;
+    private stopListening: StopListeningFunction;
+    private taskScheduler: TaskScheduler;
+    private running: boolean = false;
+    private iocContainer: Container;
     private logger: Logger;
 
     constructor(private readonly applicationConfigurationProvider: () => ApplicationConfiguration,
@@ -40,6 +48,9 @@ export default class Botyo
 
     async start(): Promise<void>
     {
+        if (this.running) return;
+        this.running = true;
+
         Botyo.printBanner();
 
         this.logger = LoggingUtils.createLogger("Botyo", true);
@@ -50,17 +61,32 @@ export default class Botyo
         this.applicationContainer = ApplicationContainer.create();
         this.applicationConfiguration = this.applicationConfigurationProvider.call(this);
         this.applicationContainer.bindApplicationConfiguration(this.applicationConfiguration);
+        this.iocContainer = this.applicationContainer.getIoCContainer();
 
         await this.bindAsyncResolvables();
         this.bindModuleConfigs();
         this.bindModules();
-        this.attachFilterChainMessageListener();
+        await this.attachFilterChainMessageListener();
         this.startTaskScheduler();
     }
 
     async stop(): Promise<void>
     {
-        // TODO Implement
+        if (!this.running) return;
+        this.running = false;
+
+        this.logger.info("Botyo is shutting down...");
+
+        try {
+            await this.invokeFunctionOnAllModules("onShutdown")
+        } catch (err) {
+            this.logger.warn("A non-fatal error occurred while shutting down modules", err);
+        }
+
+        if (this.taskScheduler) this.taskScheduler.stop();
+        if (this.stopListening) this.stopListening();
+
+        this.logger.info("Botyo has been shut down");
     }
 
     private async bindAsyncResolvables()
@@ -98,12 +124,12 @@ export default class Botyo
         this.applicationContainer.bindToSelfAndGet(CommandExecutorFilter);
     }
 
-    private attachFilterChainMessageListener()
+    private async attachFilterChainMessageListener()
     {
-        const filterChain = this.applicationContainer.getIoCContainer().get(FilterChain);
-        const chatApi = this.applicationContainer.getIoCContainer().get(ChatApi.SYMBOL) as ChatApi & MessageListener;
+        const filterChain = this.iocContainer.get(FilterChain);
+        const chatApi = this.iocContainer.get(ChatApi.SYMBOL) as ChatApi & MessageListener;
 
-        chatApi.listen((err, msg) => {
+        this.stopListening = chatApi.listen((err, msg) => {
             if (err) {
                 this.logger.error(err);
                 return;
@@ -111,12 +137,25 @@ export default class Botyo
 
             filterChain.pass(msg);
         });
+
+        await this.invokeFunctionOnAllModules("onListen");
+    }
+
+    private async invokeFunctionOnAllModules(fnName: keyof Module)
+    {
+        await Bluebird
+            .all(this.iocContainer
+                .get(ModuleRegistry)
+                .getModules()
+                .map(module => module[fnName])
+                .map(fn => Bluebird.try(() => fn())))
+            .then(() => {});
     }
 
     private startTaskScheduler()
     {
-        const taskScheduler = this.applicationContainer.getIoCContainer().get(TaskScheduler);
-        taskScheduler.start();
+        this.taskScheduler = this.iocContainer.get(TaskScheduler);
+        this.taskScheduler.start();
     }
 
     static builder()

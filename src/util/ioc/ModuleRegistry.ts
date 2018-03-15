@@ -33,6 +33,14 @@ export default class ModuleRegistry
         return this.scheduledTaskModules;
     }
 
+    getModules(): Module[]
+    {
+        return ([] as Module[])
+            .concat(this.commandModules)
+            .concat(this.filterModules)
+            .concat(this.scheduledTaskModules);
+    }
+
     register(module: Module): void
     {
         if (!TypeUtils.isModule(module)) {

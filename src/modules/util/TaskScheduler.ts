@@ -12,10 +12,14 @@ export default class TaskScheduler
     private readonly taskToIntervalMap: Map<ScheduledTaskModule, Timer> = new Map();
     private readonly taskToCronJobMap: Map<ScheduledTaskModule, Job> = new Map();
     private readonly taskToExecutePromiseMap: Map<ScheduledTaskModule, Bluebird<any>> = new Map();
+    private readonly myBluebird: typeof Bluebird;
 
     constructor(@inject(ModuleRegistry) private readonly registry: ModuleRegistry,
                 @inject(Logger.SYMBOL) private readonly logger: Logger)
-    {}
+    {
+        this.myBluebird = Bluebird.getNewLibraryCopy();
+        this.myBluebird.config({ cancellation: true });
+    }
 
     start()
     {
@@ -60,6 +64,7 @@ export default class TaskScheduler
         this.taskToCronJobMap.forEach(job => job.cancel());
         this.taskToCronJobMap.clear();
 
+        this.taskToExecutePromiseMap.forEach(promise => promise.cancel());
         this.taskToExecutePromiseMap.clear();
 
         this.logger.info("Task scheduler has been stopped");
@@ -78,7 +83,7 @@ export default class TaskScheduler
             return;
         }
 
-        const executePromise = Bluebird.try(() => module.execute());
+        const executePromise = this.myBluebird.try(() => module.execute());
         this.taskToExecutePromiseMap.set(module, executePromise);
 
         this.logger.info(`Scheduled task '${taskName}' started`);
