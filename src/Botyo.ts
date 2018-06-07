@@ -44,7 +44,7 @@ export default class Botyo
                 private readonly asyncResolvables: Constructor<AsyncResolvable<any>>[],
                 private readonly modules: Constructor<Module>[],
                 private readonly commandErrorHandler: Constructor<CommandErrorHandlerModule>,
-                private readonly moduleConfigs: Map<Constructor<Module>, {}>)
+                private readonly moduleConfigs: Map<Constructor<Module>, object>)
     {}
 
     async start(): Promise<void>

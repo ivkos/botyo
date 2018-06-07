@@ -17,7 +17,7 @@ export default class BotyoBuilder
 
     private readonly asyncResolvables: Constructor<AsyncResolvable<any>>[] = [];
     private readonly modules: Constructor<Module>[] = [];
-    private readonly moduleConfigs: Map<Constructor<Module>, {}> = new Map();
+    private readonly moduleConfigs: Map<Constructor<Module>, object> = new Map();
 
     private commandErrorHandler: Constructor<CommandErrorHandlerModule> = FriendlyCommandErrorHandler;
 
@@ -63,7 +63,7 @@ export default class BotyoBuilder
         return this;
     }
 
-    registerModule<M extends Module>(clazz: Constructor<M>, config: {} = {}): this
+    registerModule<M extends Module>(clazz: Constructor<M>, config: object = {}): this
     {
         BotyoBuilder.checkClass(clazz, "Module", TypeUtils.isModule);
 
@@ -73,7 +73,7 @@ export default class BotyoBuilder
         return this;
     }
 
-    registerCommandErrorHandler<M extends CommandErrorHandlerModule>(clazz: Constructor<M>, config: {} = {}): this
+    registerCommandErrorHandler<M extends CommandErrorHandlerModule>(clazz: Constructor<M>, config: object = {}): this
     {
         BotyoBuilder.checkClass(clazz, "CommandErrorHandlerModule", TypeUtils.isCommandErrorHandlerModule);
 

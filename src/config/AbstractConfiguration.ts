@@ -13,5 +13,5 @@ export abstract class AbstractConfiguration implements Configuration
 
     abstract setProperty<T = any>(property: string, value: T): void;
 
-    abstract getRawObject(): {};
+    abstract getRawObject(): object;
 }

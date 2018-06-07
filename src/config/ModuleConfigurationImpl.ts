@@ -3,6 +3,7 @@ import {
     Constructor,
     ContextualizableModuleConfiguration,
     FacebookId,
+    Message,
     MessageContextSwitcher,
     Module,
     ModuleConfiguration
@@ -34,7 +35,7 @@ export default class ModuleConfigurationImpl
         return this.applicationConfiguration.setProperty(this.resolveModulePropertyPath(property), value);
     }
 
-    inContext(messageContext: {}): MessageContextSwitcher
+    inContext(messageContext: Message): MessageContextSwitcher
     {
         return new MessageContextSwitcherImpl(this.applicationConfiguration, this.moduleConstructor, messageContext);
     }
@@ -44,7 +45,7 @@ export default class ModuleConfigurationImpl
         return this.inContext({ threadID: chatThreadId }).ofChatThread();
     }
 
-    getRawObject(): {}
+    getRawObject(): object
     {
         return this.applicationConfiguration.getProperty(this.resolveModulePropertyPath());
     }

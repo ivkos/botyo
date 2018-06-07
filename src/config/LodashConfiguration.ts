@@ -3,7 +3,7 @@ import { AbstractConfiguration } from "./AbstractConfiguration";
 
 export default class LodashConfiguration extends AbstractConfiguration
 {
-    constructor(private readonly rawConfigObj: {})
+    constructor(private readonly rawConfigObj: object)
     {
         super();
     }
@@ -27,7 +27,7 @@ export default class LodashConfiguration extends AbstractConfiguration
         _.set(this.rawConfigObj, property, value);
     }
 
-    getRawObject(): {}
+    getRawObject(): object
     {
         return this.rawConfigObj;
     }

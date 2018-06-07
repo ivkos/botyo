@@ -56,7 +56,7 @@ export default class MessageContextAwareModuleConfiguration extends AbstractModu
         }
     }
 
-    getRawObject(): {}
+    getRawObject(): object
     {
         let result;
 

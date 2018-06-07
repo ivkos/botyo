@@ -77,7 +77,7 @@ export default class FacebookLoginHelper
         });
     }
 
-    private makeLoginOptions(): {}
+    private makeLoginOptions(): object
     {
         const loginData: any = {};
 
