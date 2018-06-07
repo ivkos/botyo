@@ -3,7 +3,6 @@
     "outDir": "build/",
     "module": "commonjs",
     "target": "es2017",
-    "lib": [ "es2017" ],
     "declaration": true,
     "sourceMap": true,
     "noImplicitAny": true,
