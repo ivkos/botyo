@@ -47,12 +47,12 @@ export class FacebookChatApi implements ChatApi, MessageListener
 
     async getThreadInfo(threadId: FacebookId): Promise<ThreadInfo>
     {
-        return this.wrap(this.facebookChatApi.getThreadInfoGraphQL)(threadId);
+        return this.wrap(this.facebookChatApi.getThreadInfo)(threadId);
     }
 
     async getThreadHistory(threadId: FacebookId, amount: number, timestamp?: number): Promise<Message[]>
     {
-        return this.wrap(this.facebookChatApi.getThreadHistoryGraphQL)(threadId, amount, timestamp);
+        return this.wrap(this.facebookChatApi.getThreadHistory)(threadId, amount, timestamp);
     }
 
     async sendTypingIndicator(threadId: FacebookId): Promise<EndTypingIndicatorFunction>
