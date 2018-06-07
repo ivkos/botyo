@@ -1,21 +1,18 @@
 import {
     AbstractFilterModule,
     CommandErrorHandlerModule,
-    Constructor,
     ContextualizableModuleConfiguration,
     Logger,
-    Message,
-    Module
+    Message
 } from "botyo-api";
-import ModuleRegistry from "../util/ioc/ModuleRegistry";
 import { inject } from "inversify";
 import * as _ from "lodash";
-import HelpCommand from "./HelpCommand";
 import * as Bluebird from "bluebird";
+import CommandManager from "../util/ioc/CommandManager";
 
 export default class CommandExecutorFilter extends AbstractFilterModule
 {
-    constructor(@inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry,
+    constructor(@inject(CommandManager) private readonly commandManager: CommandManager,
                 @inject(CommandErrorHandlerModule.SYMBOL) private readonly errorHandler: CommandErrorHandlerModule,
                 @inject(Logger.SYMBOL) private readonly logger: Logger)
     {
@@ -31,21 +28,14 @@ export default class CommandExecutorFilter extends AbstractFilterModule
         }
 
         const commandName = CommandExecutorFilter.getCommandNameFromMessage(configuration, msg);
-        const commandModule = this.moduleRegistry.getCommandToCommandModuleMap().get(commandName);
+        const commandModule = this.commandManager.getCommandToCommandModuleMap(msg).get(commandName);
 
         if (commandModule === undefined) {
             this.getRuntime().getLogger().info(`Unknown command '${commandName}'`);
             return;
         }
 
-        const isCommandEnabledInCtx = this.getRuntime()
-            .getApplicationConfiguration()
-            .forModule(commandModule.constructor as Constructor<Module>)
-            .inContext(msg)
-            .ofParticipant()
-            .isEnabled();
-
-        if (!isCommandEnabledInCtx) {
+        if (!CommandManager.isCommandEnabledInContext(commandModule, msg)) {
             this.logger.info(
                 `Command '${commandName}' is disabled in context: chat thread '${msg.threadID}' / participant '${msg.senderID}'`
             );
@@ -57,8 +47,8 @@ export default class CommandExecutorFilter extends AbstractFilterModule
         const args = CommandExecutorFilter.getArgs(msg);
 
         if (!commandModule.validate(msg, args)) {
-            const prefix = CommandExecutorFilter.getPrefixOfContext(configuration, msg);
-            const helpText = HelpCommand.makeHelpText(prefix, commandName, commandModule);
+            const prefix = CommandManager.getPrefixOfContext(configuration, msg);
+            const helpText = CommandManager.makeHelpText(prefix, commandName, commandModule);
 
             return chatApi.sendMessage(
                 msg.threadID,
@@ -92,23 +82,12 @@ export default class CommandExecutorFilter extends AbstractFilterModule
         return msg.body.substring(msg.body.indexOf(prefixedCommand) + prefixedCommand.length).trim();
     }
 
-    static getCommandNameFromMessage(cfg: ContextualizableModuleConfiguration, msg: Message)
+    private static getCommandNameFromMessage(cfg: ContextualizableModuleConfiguration, msg: Message)
     {
         const prefixedCommand = msg.body.split(/\s+/)[0];
 
-        const prefix = CommandExecutorFilter.getPrefixOfContext(cfg, msg);
+        const prefix = CommandManager.getPrefixOfContext(cfg, msg);
         return prefixedCommand.substring(prefixedCommand.indexOf(prefix) + prefix.length);
-    }
-
-    static getPrefixOfContext(cfg: ContextualizableModuleConfiguration, ctx: Message)
-    {
-        return cfg
-            .inContext(ctx)
-            .ofChatThread()
-            .getOrElse(
-                CommandExecutorFilter.CONFIG_KEY_PREFIX,
-                CommandExecutorFilter.DEFAULT_PREFIX
-            );
     }
 
     private static shouldProcess(cfg: ContextualizableModuleConfiguration, msg: Message): boolean
@@ -121,10 +100,7 @@ export default class CommandExecutorFilter extends AbstractFilterModule
         if (!isEnabled) return false;
         if (_.isEmpty(msg.body)) return false;
 
-        const prefixOfContext = CommandExecutorFilter.getPrefixOfContext(cfg, msg);
+        const prefixOfContext = CommandManager.getPrefixOfContext(cfg, msg);
         return msg.body.startsWith(prefixOfContext);
     }
-
-    static readonly CONFIG_KEY_PREFIX = "prefix";
-    static readonly DEFAULT_PREFIX = "#";
 }

@@ -28,6 +28,7 @@ import TaskScheduler from "./modules/util/TaskScheduler";
 import ModuleRegistry from "./util/ioc/ModuleRegistry";
 import * as Bluebird from "bluebird";
 import { Container } from "inversify";
+import CommandManager from "./util/ioc/CommandManager";
 
 export default class Botyo
 {
@@ -122,6 +123,7 @@ export default class Botyo
         }
 
         this.applicationContainer.bindToSelfAndGet(CommandExecutorFilter);
+        this.iocContainer.get(CommandManager).populate();
     }
 
     private async attachFilterChainMessageListener()

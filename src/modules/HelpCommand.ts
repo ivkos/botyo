@@ -1,11 +1,13 @@
-import { AbstractCommandModule, CommandModule, Constants, Constructor, Message, Module } from "botyo-api";
+import { AbstractCommandModule, Message } from "botyo-api";
 import { inject } from "inversify";
-import ModuleRegistry from "../util/ioc/ModuleRegistry";
 import CommandExecutorFilter from "./CommandExecutorFilter";
+import CommandManager from "../util/ioc/CommandManager";
+import ModuleRegistry from "../util/ioc/ModuleRegistry";
 
 export default class HelpCommand extends AbstractCommandModule
 {
-    constructor(@inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry)
+    constructor(@inject(CommandManager) private readonly commandManager: CommandManager,
+                @inject(ModuleRegistry) private readonly moduleRegistry: ModuleRegistry)
     {
         super();
     }
@@ -54,7 +56,7 @@ export default class HelpCommand extends AbstractCommandModule
     private getHelp(msg: Message, prefix: string, args: string): Promise<any>
     {
         const commandName = HelpCommand.getCommandNameFromString(prefix, args);
-        const commandModule = this.moduleRegistry.getCommandToCommandModuleMap().get(commandName);
+        const commandModule = this.commandManager.getCommandToCommandModuleMap(msg).get(commandName);
 
         if (commandModule === undefined) {
             return this.getRuntime().getChatApi().sendMessage(
@@ -63,36 +65,27 @@ export default class HelpCommand extends AbstractCommandModule
             );
         }
 
-        const helpText = HelpCommand.makeHelpText(prefix, commandName, commandModule);
+        const helpText = CommandManager.makeHelpText(prefix, commandName, commandModule);
 
         return this.getRuntime().getChatApi().sendMessage(msg.threadID, helpText);
     }
 
-    static makeHelpText(prefix: string, commandName: string, commandModule: CommandModule)
-    {
-        return `\u2139 ${prefix}${commandName} - ${commandModule.getDescription()}\n` +
-            `\u{1F527} Usage: ${prefix}${commandName} ${commandModule.getUsage()}`;
-    }
-
     private getContextPrefix(ctx: Message)
     {
-        return CommandExecutorFilter.getPrefixOfContext(this.getRuntime()
-            .getApplicationConfiguration().forModule(CommandExecutorFilter), ctx);
+        return CommandManager.getPrefixOfContext(this.getRuntime().getApplicationConfiguration().forModule(CommandExecutorFilter), ctx);
     }
 
     private makeCommandList(ctx: Message, prefix: string): string
     {
         let str = "\u{1F527} Command list:\n\n";
 
-        for (let [commandName, module] of this.moduleRegistry.getCommandToCommandModuleMap().entries()) {
-            const moduleCfg = this.getRuntime()
-                .getApplicationConfiguration().forModule(module.constructor as Constructor<Module>);
+        for (let module of this.moduleRegistry.getCommandModules()) {
+            if (CommandManager.isCommandHiddenInContext(module, ctx) ||
+                !CommandManager.isCommandEnabledInContext(module, ctx)) {
+                continue;
+            }
 
-            const isHidden = moduleCfg.inContext(ctx).ofParticipant()
-                .getOrElse(Constants.CONFIG_KEY_HIDDEN, false);
-
-            if (isHidden) continue;
-
+            const commandName = this.commandManager.getCommandNameForModuleInContext(module, ctx);
             str += `${prefix}${commandName} - ${module.getDescription()}\n`;
         }
 

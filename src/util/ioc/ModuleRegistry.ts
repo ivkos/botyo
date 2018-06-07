@@ -1,7 +1,6 @@
 import { inject, injectable } from "inversify";
 import { CommandModule, FilterModule, Logger, Module, ScheduledTaskModule } from "botyo-api";
 import TypeUtils from "../TypeUtils";
-import * as _ from "lodash";
 
 @injectable()
 export default class ModuleRegistry
@@ -9,18 +8,12 @@ export default class ModuleRegistry
     private readonly commandModules: CommandModule[] = [];
     private readonly filterModules: FilterModule[] = [];
     private readonly scheduledTaskModules: ScheduledTaskModule[] = [];
-    private readonly commandToCommandModuleMap: Map<string, CommandModule> = new Map();
 
     constructor(@inject(Logger.SYMBOL) private readonly logger: Logger) {}
 
     getCommandModules(): CommandModule[]
     {
         return this.commandModules;
-    }
-
-    getCommandToCommandModuleMap(): Map<string, CommandModule>
-    {
-        return this.commandToCommandModuleMap;
     }
 
     getFilterModules(): FilterModule[]
@@ -74,50 +67,7 @@ export default class ModuleRegistry
 
     private registerCommandModule(module: CommandModule): void
     {
-        let commands: string | string[] = module.getCommand();
-
-        if (!_.isString(commands) && !_.isArray(commands)) {
-            throw new Error(`${module.constructor.name}::${module.getCommand.name}() must return a string or an array of strings`);
-        }
-
-        if (_.isArray(commands) && commands.length === 0) {
-            throw new Error(`${module.constructor.name}::${module.getCommand.name}() must not return an empty array`);
-        }
-
-        if (!_.isArray(commands)) {
-            commands = [commands];
-        }
-
-        for (let command of commands) {
-            if (!ModuleRegistry.isValidCommand(command)) {
-                throw new Error(`Module '${module.constructor.name}' is trying to handle invalid command '${command}'`);
-            }
-
-            const previouslyRegisteredCommandModule = this.commandToCommandModuleMap.get(command);
-
-            if (previouslyRegisteredCommandModule !== undefined) {
-                throw new Error(`Module '${module.constructor.name}' is trying to register command '${command}' ` +
-                    `that is already registered by '${previouslyRegisteredCommandModule.constructor.name}'`);
-            }
-
-            this.commandToCommandModuleMap.set(command, module);
-        }
-
         this.commandModules.push(module);
-
-        this.logger.info(
-            `Registered command module '${module.constructor.name}' ` +
-            `handling command${commands.length > 1 ? 's' : ''}: ${commands.join(', ')}`
-        );
-    }
-
-    private static isValidCommand(command: string): boolean
-    {
-        if (!command) return false;
-        if (!_.isString(command)) return false;
-        if (command.length === 0) return false;
-        if (command.includes(' ')) return false;
-
-        return true;
+        this.logger.info(`Registered command module '${module.constructor.name}'`);
     }
 }

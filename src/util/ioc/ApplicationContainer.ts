@@ -19,6 +19,7 @@ import FilterChain from "../../modules/util/FilterChain";
 import TaskScheduler from "../../modules/util/TaskScheduler";
 import TypeUtils from "../TypeUtils";
 import { ModuleAwareRuntimeImpl } from "../ModuleAwareRuntimeImpl";
+import CommandManager from "./CommandManager";
 import ServiceIdentifier = interfaces.ServiceIdentifier;
 
 const METADATA_KEYS = require("inversify/lib/constants/metadata_keys");
@@ -118,6 +119,7 @@ export default class ApplicationContainer
     private bindInternals(): void
     {
         this.container.bind<FilterChain>(FilterChain).toSelf().inSingletonScope();
+        this.container.bind<CommandManager>(CommandManager).toSelf().inSingletonScope();
         this.container.bind<TaskScheduler>(TaskScheduler).toSelf().inSingletonScope();
         this.container.bind<ModuleRegistry>(ModuleRegistry).toSelf().inSingletonScope();
         this.container.bind<ChatThreadUtils>(ChatThreadUtils.SYMBOL).to(ChatThreadUtilsImpl).inSingletonScope();
