@@ -2,7 +2,7 @@ import { AbstractCommandErrorHandlerModule, CommandModule, Message } from "botyo
 
 export default class FriendlyCommandErrorHandler extends AbstractCommandErrorHandlerModule
 {
-    async handle(err: Error, message: Message, commandModule: CommandModule): Promise<void>
+    async handle(err: Error, message: Message, commandModule: CommandModule): Promise<any>
     {
         const firstName = this.getRuntime().getChatThreadUtils().getFirstNameByMessage(message);
 

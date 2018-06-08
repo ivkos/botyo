@@ -1,4 +1,4 @@
-import { ApplicationConfiguration, Constants, Constructor, Module, } from "botyo-api";
+import { ApplicationConfiguration, Constants, Constructor, FacebookId, Module, } from "botyo-api";
 import * as _ from "lodash";
 import LodashConfiguration from "./LodashConfiguration";
 import { AbstractModuleConfiguration } from "./AbstractModuleConfiguration";
@@ -14,8 +14,8 @@ export default class MessageContextAwareModuleConfiguration extends AbstractModu
     constructor(private readonly applicationConfiguration: ApplicationConfiguration,
                 protected readonly moduleConstructor: Constructor<Module>,
                 private readonly cfgCtx: ConfigurationContext,
-                private readonly threadId: string,
-                private readonly senderId: string)
+                private readonly threadId: FacebookId,
+                private readonly senderId: FacebookId)
     {
         super();
     }

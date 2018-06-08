@@ -7,6 +7,7 @@ import {
     Message,
     MessageHandler,
     MessageListener,
+    OutgoingMessage,
     Reaction,
     StopListeningFunction,
     ThreadInfo,
@@ -35,7 +36,7 @@ export class FacebookChatApi implements ChatApi, MessageListener
         return (this.stopListeningFn = this.facebookChatApi.listen(handler));
     }
 
-    async sendMessage(threadId: FacebookId, message: Message | string): Promise<Message>
+    async sendMessage(threadId: FacebookId, message: OutgoingMessage | string): Promise<Message>
     {
         return this.wrap(this.facebookChatApi.sendMessage)(message, threadId);
     }

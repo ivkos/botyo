@@ -22,7 +22,7 @@ export default class FilterChain
             if (!isEnabled) continue;
 
             try {
-                currentMessage = await Bluebird.try(() => filterModule.filter(currentMessage));
+                currentMessage = await Bluebird.try(() => filterModule.filter(currentMessage as Message));
             } catch (err) {
                 this.logger.error("Filter chain broke due to an error", err);
                 break;

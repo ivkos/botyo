@@ -1,6 +1,6 @@
 import {
     ApplicationConfiguration,
-    Constructor,
+    Constructor, FacebookId,
     Message,
     MessageContextSwitcher,
     Module,
@@ -10,8 +10,8 @@ import MessageContextAwareModuleConfiguration, { ConfigurationContext } from "./
 
 export default class MessageContextSwitcherImpl implements MessageContextSwitcher
 {
-    private threadId: string;
-    private senderId: string;
+    private threadId: FacebookId;
+    private senderId: FacebookId;
 
     constructor(private readonly applicationConfiguration: ApplicationConfiguration,
                 private readonly moduleConstructor: Constructor<Module>,

@@ -42,7 +42,7 @@ export default class ModuleConfigurationImpl
 
     inContextOfChatThread(chatThreadId: FacebookId): ModuleConfiguration
     {
-        return this.inContext({ threadID: chatThreadId }).ofChatThread();
+        return this.inContext({ threadID: chatThreadId } as any).ofChatThread();
     }
 
     getRawObject(): object
