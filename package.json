@@ -1,12 +1,13 @@
 {
   "name": "botyo",
-  "version": "2.0.0-alpha.56",
+  "version": "2.0.0-alpha.57",
   "description": "Botyo Runtime Components",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
     "prebuild": "rimraf build/",
     "build": "tsc -p .",
+    "docs": "typedoc --out docs/ --mode file --name \"Botyo Documentation\" --gaID UA-38096478-9 --excludeNotExported --excludePrivate",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -44,6 +45,7 @@
     "@types/string-similarity": "^1.2.0",
     "@types/winston": "^2.3.7",
     "rimraf": "^2.6.2",
+    "typedoc": "^0.11.1",
     "typescript": "^2.6.1"
   },
   "engines": {
