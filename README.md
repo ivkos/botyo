@@ -15,6 +15,13 @@ in mind.
 `npm install --save botyo`
 
 
+## Documentation
+
+Documentation for Botyo is available here:
+* [Botyo Documentation](https://ivkos.github.io/botyo)
+* [Botyo API Documentation](https://ivkos.github.io/botyo-api)
+
+
 ## Quick Start
 Please explore the [Botyo Example Project](https://github.com/ivkos/botyo-example) to jump start your project.
 
