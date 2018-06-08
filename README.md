@@ -1,7 +1,7 @@
 # Botyo
-[![npm](https://img.shields.io/npm/v/botyo.svg)](https://www.npmjs.com/package/botyo-bundle-instagram)
-[![npm](https://img.shields.io/npm/dt/botyo.svg)](https://www.npmjs.com/package/botyo-bundle-instagram)
-![npm](https://img.shields.io/npm/l/botyo.svg)
+[![npm](https://img.shields.io/npm/v/botyo.svg)](https://www.npmjs.com/package/botyo)
+[![npm](https://img.shields.io/npm/dt/botyo.svg)](https://www.npmjs.com/package/botyo)
+![license](https://img.shields.io/npm/l/botyo.svg)
 
 **Botyo** is a modular bot designed for group chat rooms on Facebook. It is designed with flexibility and modularity 
 in mind.
